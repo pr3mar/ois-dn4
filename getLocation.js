@@ -2,6 +2,7 @@
  * Created by Марко on 09.12.2014.
  */
 var lat, lon;
+var map;
 
 function getLocation() {
     if(navigator.geolocation) {
@@ -17,22 +18,8 @@ function showPosition(position) {
     lat = position.coords.latitude;
     lon = position.coords.longitude;
     //console.log(lat, lon);
-}
-
-function initialize(position) {
-    var mapOptions = {
-        zoom: 12,
-        center: new google.maps.LatLng(46.057184, 14.506865)
-    };
-
-    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-    var myLatLang = new google.maps.LatLng(46.057184, 14.506865);
-    //getLocation();
-    console.log(lat, lon);
-    if(lat != undefined && lon != undefined) {
-        myLatLang =  new google.maps.LatLng(lat, lon);
-    }
-
+    console.log(map);
+    var myLatLang = new google.maps.LatLng(lat, lon);
     var contentString = '<div id="content">'+
         '<div id="siteNotice">'+
         '</div>'+
@@ -43,7 +30,7 @@ function initialize(position) {
         '</div>';
     var infowindow = new google.maps.InfoWindow({
         content: contentString,
-    maxWidth: 200
+        maxWidth: 200
     });
 
     marker = new google.maps.Marker({
@@ -51,14 +38,26 @@ function initialize(position) {
         map:map,
         title:'Hello!'
     });
+    marker.setMap(map);
 
     google.maps.event.addListener(marker, 'click', function() {
         infowindow.open(map,marker);
     });
 }
 
-function loadScript() {
+function initialize() {
+    var mapOptions = {
+        zoom: 12,
+        center: new google.maps.LatLng(46.057184, 14.506865)
+    };
+
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    var myLatLang = new google.maps.LatLng(46.057184, 14.506865);
+    //getLocation();
     getLocation();
+}
+
+function loadScript() {
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&' +
