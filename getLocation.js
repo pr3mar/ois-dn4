@@ -6,24 +6,22 @@ var map;
 
 function getLocation() {
     if(navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
         $('#locationDemo').append("<div class=\"napaka\">update your fucking browser.</div>");
     }
-
 }
-
 function showPosition(position) {
     //$('#locationDemo').append("<div class=\"\">" + position.coords.latitude + " " + position.coords.longitude + "</div>");
     lat = position.coords.latitude;
     lon = position.coords.longitude;
     //console.log(lat, lon);
-    console.log(map);
+    //console.log(map);
     var myLatLang = new google.maps.LatLng(lat, lon);
     var contentString = '<div id="content">'+
         '<div id="siteNotice">'+
         '</div>'+
-        '<h1 id="secondHeading" class="secondHeading">Your location</h1>'+
+        '<h1 id="thirdHeading" class="thirdHeading">Your location</h1>'+
         '<div id="bodyContent">'+
         '<p><b>You are currently here!</b></p>'+
         '</div>'+
@@ -36,13 +34,37 @@ function showPosition(position) {
     marker = new google.maps.Marker({
         position: myLatLang,
         map:map,
-        title:'Hello!'
+        title:'Hello!',
+        animation:google.maps.Animation.DROP
     });
     marker.setMap(map);
 
     google.maps.event.addListener(marker, 'click', function() {
+        if (marker.getAnimation() != null) {
+            marker.setAnimation(null);
+        } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){ marker.setAnimation(null); }, 1500);
+        }
         infowindow.open(map,marker);
     });
+}
+
+function showError(err) {
+    switch (err.code) {
+        case err.PERMISSION_DENIED:
+            $("#error").append("<p>permission denied</p>");
+            break;
+        case err.POSITION_UNAVAILABLE:
+            $("#error").append("<p>location unavailable</p>");
+            break;
+        case err.TIMEOUT:
+            $("#error").append("<p>timeout</p>");
+            break;
+        case err.UNKNOWN_ERR:
+            $("#error").append("<p>what the hell did you do??</p>");
+            break;
+    }
 }
 
 function initialize() {
