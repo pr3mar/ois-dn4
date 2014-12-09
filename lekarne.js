@@ -1,4 +1,4 @@
-[
+lekarne = [
   {
     "lekarna": "Centralna lekarna",
     "naslov": "Prešernov trg 5, 1000 Ljubljana",
