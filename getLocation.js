@@ -16,8 +16,8 @@ function showPosition(position) {
 
 function initialize() {
     var mapOptions = {
-        zoom: 8,
-        center: new google.maps.LatLng(-34.397, 150.644)
+        zoom: 12,
+        center: new google.maps.LatLng(46.057184, 14.506865)
     };
 
     var map = new google.maps.Map(document.getElementById('map-canvas'),
@@ -33,6 +33,7 @@ function loadScript() {
 }
 
 window.onload = loadScript;
+
 /*$(document).ready(function(){
     getLocation();
 })*/
