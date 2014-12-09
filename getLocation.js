@@ -11,16 +11,22 @@ function getLocation() {
         $('#locationDemo').append("<div class=\"napaka\">update your fucking browser.</div>");
     }
 }
+
 function showPosition(position) {
     //$('#locationDemo').append("<div class=\"\">" + position.coords.latitude + " " + position.coords.longitude + "</div>");
+    var markers = [];
+    //var data = [];
+    var string = [];
+    var info = [];
+
     lat = position.coords.latitude;
     lon = position.coords.longitude;
     //console.log(lat, lon);
     //console.log(map);
-    var defaultLatLang = new google.maps.LatLng(46.057184, 14.506865);
+    //var defaultLatLang = new google.maps.LatLng(46.057184, 14.506865);
     var myLatLang = new google.maps.LatLng(lat, lon);
-
-    var contentString = '<div id="content">'+
+    var min_lekarna = calculateDistance(myLatLang );
+    var contentStringMyLocation = '<div id="content">'+
         '<div id="siteNotice">'+
         '</div>'+
         '<h1 id="thirdHeading" class="thirdHeading">Your location</h1>'+
@@ -28,29 +34,62 @@ function showPosition(position) {
         '<p><b>You are currently here!</b></p>'+
         '</div>'+
         '</div>';
-    var infowindow = new google.maps.InfoWindow({
-        content: contentString,
+    var contentStringPharmacy = '<div id="content">'+
+        '<div id="siteNotice">'+
+        '</div>'+
+        '<h1 id="thirdHeading" class="thirdHeading">'+min_lekarna.lekarna+'</h1>'+
+        '<div id="bodyContent">'+
+        '<p><b>'+min_lekarna.telefon+'</b></p>'+
+        '<p><b>'+min_lekarna.odpiralni_cas+'</b></p>'+
+        '<p><b>'+min_lekarna.naslov+'</b></p>'+
+        '</div>'+
+        '</div>';
+    string.push(contentStringMyLocation);
+    string.push(contentStringPharmacy);
+
+    var infowindowMyLocation = new google.maps.InfoWindow({
+        content: contentStringMyLocation,
         maxWidth: 200
     });
-
-    marker = new google.maps.Marker({
+    var infowindowPharmacy = new google.maps.InfoWindow({
+        content: contentStringPharmacy,
+        maxWidth: 200
+    });
+    info.push(infowindowMyLocation);
+    info.push(infowindowPharmacy);
+    markers.push(new google.maps.Marker({
         position: myLatLang,
         map:map,
         title:'Hello!',
         animation:google.maps.Animation.DROP
-    });
-    marker.setMap(map);
-
-    google.maps.event.addListener(marker, 'click', function() {
-        if (marker.getAnimation() != null) {
-            marker.setAnimation(null);
+    }));
+    markers.push(new google.maps.Marker({
+        position: new google.maps.LatLng(min_lekarna.lat,min_lekarna.lng),
+        map:map,
+        title:min_lekarna.lekarna,
+        animation:google.maps.Animation.DROP
+    }));
+    markers[0].setMap(map);
+    markers[1].setMap(map);
+    google.maps.event.addListener(markers[0], 'click', function() {
+        if (markers[0].getAnimation() != null) {
+            markers[0].setAnimation(null);
         } else {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function(){ marker.setAnimation(null); }, 1500);
+            markers[0].setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){ markers[0].setAnimation(null); }, 1500);
         }
-        infowindow.open(map,marker);
+        info[0].open(map,markers[0]);
     });
-    calculateDistance(myLatLang );
+    google.maps.event.addListener(markers[1], 'click', function() {
+        if (markers[1].getAnimation() != null) {
+            markers[1].setAnimation(null);
+        } else {
+            markers[1].setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){ markers[1].setAnimation(null); }, 1500);
+        }
+        info[1].open(map,markers[1]);
+    });
+
 }
 
 function calculateDistance(myLatLang) {
@@ -64,46 +103,14 @@ function calculateDistance(myLatLang) {
             min = dist;
             min_lekarna = element;
         }
-    })
+    });
     //alert(dist);
     min = Math.ceil(min);
-    $("#error").append("<p>distance: <strong>" + min + "</strong></p>");
-    $("#error").append("<p><strong>" + myLatLang.toString() + "</strong></p>");
-    $("#error").append("<p><strong>" + min_lekarna.lekarna + "</strong></p>");
+    return min_lekarna;
+    //$("#error").append("<p>distance: <strong>" + min + "</strong></p>");
+    //$("#error").append("<p><strong>" + myLatLang.toString() + "</strong></p>");
+    //$("#error").append("<p><strong>" + min_lekarna.lekarna + "</strong></p>");
     //$("#error").append("<p><strong>" + defaultLatLang.toString() + "</strong></p>");
-
-    var contentString = '<div id="content">'+
-        '<div id="siteNotice">'+
-        '</div>'+
-        '<h1 id="thirdHeading" class="thirdHeading">'+min_lekarna.lekarna+'</h1>'+
-        '<div id="bodyContent">'+
-        '<p><b>'+min_lekarna.telefon+'</b></p>'+
-        '<p><b>'+min_lekarna.odpiralni_cas+'</b></p>'+
-        '<p><b>'+min_lekarna.naslov+'</b></p>'+
-        '</div>'+
-        '</div>';
-    var infowindow = new google.maps.InfoWindow({
-        content: contentString,
-        maxWidth: 200
-    });
-
-    marker = new google.maps.Marker({
-        position: new google.maps.LatLng(min_lekarna.lat,min_lekarna.lng),
-        map:map,
-        title:min_lekarna.lekarna,
-        animation:google.maps.Animation.DROP
-    });
-    marker.setMap(map);
-
-    google.maps.event.addListener(marker, 'click', function() {
-        if (marker.getAnimation() != null) {
-            marker.setAnimation(null);
-        } else {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function(){ marker.setAnimation(null); }, 1500);
-        }
-        infowindow.open(map,marker);
-    });
 }
 
 function showError(err) {
@@ -129,7 +136,7 @@ function initialize() {
         center: new google.maps.LatLng(46.057184, 14.506865)
     };
     map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-    var myLatLang = new google.maps.LatLng(46.057184, 14.506865);
+    //var myLatLang = new google.maps.LatLng(46.057184, 14.506865);
     //getLocation();
     getLocation();
 }
