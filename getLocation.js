@@ -131,13 +131,6 @@ function initialize() {
     map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
     var myLatLang = new google.maps.LatLng(46.057184, 14.506865);
     //getLocation();
-    marker = new google.maps.Marker({
-        position: myLatLang,
-        map:map,
-        title:'Hello!',
-        animation:google.maps.Animation.DROP
-    });
-    marker.setMap(map);
     getLocation();
 }
 
