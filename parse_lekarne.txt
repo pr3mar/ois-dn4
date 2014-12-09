@@ -1,0 +1,12 @@
+declare namespace h = "http://www.w3.org/1999/xhtml";
+let $dokument := httpclient:get(xs:anyURI("http://www.lekarnaljubljana.si/si/lokacije-in-kontakti/lekarne/"), false(), ())
+let $lekarne := $dokument//select[@class="dropdown poslovalnice-dropdown"]/option/@value
+for $lekarna in $lekarne
+    let $doc := httpclient:get(xs:anyURI(concat("http://www.lekarnaljubljana.si/si/lokacije-in-kontakti/lekarne/", $lekarna)), false(), ())
+    let $podatki := $doc//div[@class="poslovalnice"]/div[@style="float: left;width: 420px;"]
+    let $ime := $podatki/h2[@class="naslov4"]/text()
+    let $naslov := $podatki/p[1]/text()
+    let $telefon := $podatki/p[2]/text()
+    let $odp_cas1 := $podatki/p[6]/strong/text()
+    let $odp_cas2 := $podatki/p[7]/strong/text()
+    return concat("{'lekarna':'",$ime,"', 'naslov':'",$naslov,"', 'telefon':'",$telefon,"', 'odpiralni_cas':'",$odp_cas1,"'},")
