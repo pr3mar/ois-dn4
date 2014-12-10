@@ -99,6 +99,7 @@ function dodajMeritveVitalnihZnakov() {
 	var telesnaTemperatura = $("#dodajVitalnoTelesnaTemperatura").val();
 	var sistolicniKrvniTlak = $("#dodajVitalnoKrvniTlakSistolicni").val();
 	var diastolicniKrvniTlak = $("#dodajVitalnoKrvniTlakDiastolicni").val();
+	var puls = $("#dodajVitalnoPuls").val();
 	var nasicenostKrviSKisikom = $("#dodajVitalnoNasicenostKrviSKisikom").val();
 	var merilec = $("#dodajVitalnoMerilec").val();
 
@@ -119,6 +120,8 @@ function dodajMeritveVitalnihZnakov() {
 		    "vital_signs/body_temperature/any_event/temperature|unit": "°C",
 		    "vital_signs/blood_pressure/any_event/systolic": sistolicniKrvniTlak,
 		    "vital_signs/blood_pressure/any_event/diastolic": diastolicniKrvniTlak,
+			"vital_signs/pulse/any_event/rate|magnitude": puls,
+			"vital_signs/pulse/any_event/rate|unit": "/min",
 		    "vital_signs/indirect_oximetry:0/spo2|numerator": nasicenostKrviSKisikom
 		};
 		var parametriZahteve = {
@@ -272,8 +275,9 @@ $(document).ready(function() {
 		$("#dodajVitalnoTelesnaTemperatura").val(podatki[4]);
 		$("#dodajVitalnoKrvniTlakSistolicni").val(podatki[5]);
 		$("#dodajVitalnoKrvniTlakDiastolicni").val(podatki[6]);
-		$("#dodajVitalnoNasicenostKrviSKisikom").val(podatki[7]);
-		$("#dodajVitalnoMerilec").val(podatki[8]);
+		$("#dodajVitalnoPuls").val(podatki[7]);
+		$("#dodajVitalnoNasicenostKrviSKisikom").val(podatki[8]);
+		$("#dodajVitalnoMerilec").val(podatki[9]);
 	});
 	$('#preberiEhrIdZaVitalneZnake').change(function() {
 		$("#preberiMeritveVitalnihZnakovSporocilo").html("");

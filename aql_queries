@@ -1,0 +1,26 @@
+-- get the medication name, quantity and time interval of consumption
+select
+    a_b/activities[at0001]/description[at0002]/items[at0003]/value/value as Medicine,
+    a_a/items[at0001, 'Quantity']/value as Quantity,
+    a_b/activities[at0001]/description[at0002]/items[at0010, 'Medication timing']/items[at0012]/value as Start_date,
+    a_b/activities[at0001]/description[at0002]/items[at0010, 'Medication timing']/items[at0013]/value as Stop_date,
+    a_a/items[at0003]/value as Description
+from EHR e
+contains COMPOSITION a
+contains (
+    CLUSTER a_a[openEHR-EHR-CLUSTER.medication_amount.v1] and
+    INSTRUCTION a_b[openEHR-EHR-INSTRUCTION.medication.v1])
+offset 0 limit 100
+
+-- get temp, bl
+select
+    a_a#Temperature as Temperature,
+    a_b#Diastolic as Diastolic,
+    a_b#Systolic as Systolic
+from EHR e[ehr_id/value='b931580f-2b05-488b-985b-8d9ffb08ad02']
+contains COMPOSITION a
+contains (
+    OBSERVATION a_a#Body_temperature and
+    OBSERVATION a_b#Blood_Pressure)
+where a_a#time/value>='2014-11-28T11:50:49'
+offset 0 limit 100
