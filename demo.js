@@ -242,6 +242,82 @@ function preberiMeritveVitalnihZnakov() {
 							console.log(JSON.parse(err.responseText).userMessage);
 					    }
 					});
+				} else if (tip == "puls") {
+					$.ajax({
+						url: baseUrl + "/view/" + ehrId + "/pulse",
+						type: "GET",
+						headers: {"Ehr-Session":sessionId},
+						success: function(res) {
+							//console.log(res);
+							var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Puls</th></tr>";
+							if (res) {
+								//console.log(rows);
+								for(var i in res) {
+									console.log(i);
+									results += "<tr><td>" + res[i].time + "</td><td class='text-right'>" + res[i].pulse + " " + res[i].unit  + "</td></tr>";
+								}
+								results += "</table>";
+								$("#rezultatMeritveVitalnihZnakov").append(results);
+							} else {
+								$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Ni podatkov! </span>");
+							}
+						},
+						error: function(){
+							$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+							console.log(JSON.parse(err.responseText).userMessage);
+						}
+					});
+				} else if(tip == "vse") {
+					/*var AQL = "select " +
+								"a_a#Temperature as Temperature," +
+									"a_b#Diastolic as Diastolic," +
+									"a_b#Systolic as Systolic," +
+									"a_c#Rate as Rate " +
+								"from EHR e[ehr_id/value='<EHRID>'] " +
+								"contains COMPOSITION a " +
+								"contains (" +
+									"OBSERVATION a_a#Body_temperature and " +
+									"OBSERVATION a_b#Blood_Pressure and " +
+									"OBSERVATION a_c#Heart_rate_and_rhythm) " +
+								"offset 0 limit 100";*/
+					var AQL = "select " +
+					"a_a/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value as temperatura, " +
+					"a_b/data[at0001]/events[at0006]/data[at0003]/items[at0005]/value as diastolicen, " +
+					"a_b/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value as sistolicen, " +
+					"a_c/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value as puls, " +
+					"a_a/data[at0002]/origin as datum " +
+					"from EHR e[ehr_id/value='b931580f-2b05-488b-985b-8d9ffb08ad02'] " +
+					"contains COMPOSITION a "
+					"contains ( "
+						"OBSERVATION a_a[openEHR-EHR-OBSERVATION.body_temperature.v1] and " +
+						"OBSERVATION a_b[openEHR-EHR-OBSERVATION.blood_pressure.v1] and " +
+						"OBSERVATION a_c[openEHR-EHR-OBSERVATION.heart_rate-pulse.v1]) " +
+					"offset 0 limit 100";
+					$.ajax({
+						url: baseUrl + "/query?" + $.param({"aql":AQL}),
+						type: 'GET',
+						headers:{"Ehr-Session": sessionId},
+						success: function(res){
+							var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th> clas'text-right'>Tlak (dias)</th><th> clas'text-right'>Tlak (sist)</th><th> clas'text-right'>Puls</th></tr>";
+							if (res) {
+								var rows = res.resultSet;
+								for (var i in rows) {
+									results += "<tr><td>" + rows[i].datum + "</td><td class='text-right'>" + rows[i].temperatura.magnitude + " " + rows[i].temperatura.unit + "</td>" +
+										"<td class='text-right'>" + rows[i].diastolicen.magnitude + " " + rows[i].diastolicen.unit + "</td>" +
+										"<td class='text-right'>" + rows[i].sistolicen.magnitude + " " + rows[i].sistolicen.unit + "</td>" +
+									"<td class='text-right'>" + rows[i].puls.magnitude + " " + rows[i].puls.unit + "</td>";
+								}
+								results += "</table>";
+								$("#rezultatMeritveVitalnihZnakov").append(results);
+							} else {
+								$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
+							}
+						},
+						error: function(){
+							$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+							console.log(JSON.parse(err.responseText).userMessage);
+						}
+					});
 				}
 	    	},
 	    	error: function(err) {
