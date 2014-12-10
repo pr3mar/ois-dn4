@@ -262,12 +262,12 @@ function preberiMeritveVitalnihZnakov() {
 								$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Ni podatkov! </span>");
 							}
 						},
-						error: function(){
+						error: function(err){
 							$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
 							console.log(JSON.parse(err.responseText).userMessage);
 						}
 					});
-				} else if(tip == "vse") {
+				} else if(tip == "vse podatke") {
 					/*var AQL = "select " +
 								"a_a#Temperature as Temperature," +
 									"a_b#Diastolic as Diastolic," +
@@ -286,26 +286,28 @@ function preberiMeritveVitalnihZnakov() {
 					"a_b/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value as sistolicen, " +
 					"a_c/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value as puls, " +
 					"a_a/data[at0002]/origin as datum " +
-					"from EHR e[ehr_id/value='b931580f-2b05-488b-985b-8d9ffb08ad02'] " +
-					"contains COMPOSITION a "
-					"contains ( "
+					"from EHR e[ehr_id/value='" + ehrId + "'] " +
+					"contains COMPOSITION a " +
+					"contains ( " +
 						"OBSERVATION a_a[openEHR-EHR-OBSERVATION.body_temperature.v1] and " +
 						"OBSERVATION a_b[openEHR-EHR-OBSERVATION.blood_pressure.v1] and " +
 						"OBSERVATION a_c[openEHR-EHR-OBSERVATION.heart_rate-pulse.v1]) " +
 					"offset 0 limit 100";
+					//console.log(AQL);
 					$.ajax({
 						url: baseUrl + "/query?" + $.param({"aql":AQL}),
 						type: 'GET',
 						headers:{"Ehr-Session": sessionId},
 						success: function(res){
-							var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th> clas'text-right'>Tlak (dias)</th><th> clas'text-right'>Tlak (sist)</th><th> clas'text-right'>Puls</th></tr>";
+							var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th class='text-right'>Tlak (dias)</th><th class='text-right'>Tlak (sist)</th><th> clas'text-right'>Puls</th></tr>";
 							if (res) {
 								var rows = res.resultSet;
+								console.log(rows);
 								for (var i in rows) {
-									results += "<tr><td>" + rows[i].datum + "</td><td class='text-right'>" + rows[i].temperatura.magnitude + " " + rows[i].temperatura.unit + "</td>" +
-										"<td class='text-right'>" + rows[i].diastolicen.magnitude + " " + rows[i].diastolicen.unit + "</td>" +
-										"<td class='text-right'>" + rows[i].sistolicen.magnitude + " " + rows[i].sistolicen.unit + "</td>" +
-									"<td class='text-right'>" + rows[i].puls.magnitude + " " + rows[i].puls.unit + "</td>";
+									results += "<tr><td>" + rows[i].datum.value + "</td><td class='text-right'>" + rows[i].temperatura.magnitude + " " + rows[i].temperatura.units + "</td>" +
+										"<td class='text-right'>" + rows[i].diastolicen.magnitude + " " + rows[i].diastolicen.units + "</td>" +
+										"<td class='text-right'>" + rows[i].sistolicen.magnitude + " " + rows[i].sistolicen.units + "</td>" +
+									"<td class='text-right'>" + rows[i].puls.magnitude + " " + rows[i].puls.units + "</td></tr>";
 								}
 								results += "</table>";
 								$("#rezultatMeritveVitalnihZnakov").append(results);
@@ -313,7 +315,7 @@ function preberiMeritveVitalnihZnakov() {
 								$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
 							}
 						},
-						error: function(){
+						error: function(err){
 							$("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
 							console.log(JSON.parse(err.responseText).userMessage);
 						}
