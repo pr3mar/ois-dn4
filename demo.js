@@ -110,6 +110,8 @@ function dodajMeritveVitalnihZnakov() {
 
 	if (!ehrId || ehrId.trim().length == 0) {
 		$("#dodajMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-warning fade-in'>Prosim vnesite zahtevane podatke!</span>");
+	} else if( ura > 23 || ura < 0 || min < 0 || min > 59) {
+		$("#dodajMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-warning fade-in'>Prosim vnesite pravilne podatke časa!</span>");
 	} else {
 		$.ajaxSetup({
 		    headers: {"Ehr-Session": sessionId}
