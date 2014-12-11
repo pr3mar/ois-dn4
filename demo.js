@@ -93,7 +93,12 @@ function dodajMeritveVitalnihZnakov() {
 	sessionId = getSessionId();
 
 	var ehrId = $("#dodajVitalnoEHR").val();
-	var datumInUra = $("#dodajVitalnoDatumInUra").val();
+	var datumInUra;// = $("#dodajVitalnoDatumInUra").val();
+	var datum = $("#dodajVitalnoDatum").val();
+	var ura = $("#dodajVitalnoUra").val();
+	var min = $("#dodajVitalnoMinute").val();
+	//2014-11-21T11:40Z
+	datumInUra = datum + "T" + ura + ":" + min + "Z";
 	var telesnaVisina = $("#dodajVitalnoTelesnaVisina").val();
 	var telesnaTeza = $("#dodajVitalnoTelesnaTeza").val();
 	var telesnaTemperatura = $("#dodajVitalnoTelesnaTemperatura").val();
@@ -299,12 +304,18 @@ function preberiMeritveVitalnihZnakov() {
 						type: 'GET',
 						headers:{"Ehr-Session": sessionId},
 						success: function(res){
-							var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th class='text-right'>Tlak (dias)</th><th class='text-right'>Tlak (sist)</th><th> clas'text-right'>Puls</th></tr>";
+							var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th class='text-right'>Tlak (dias)</th><th class='text-right'>Tlak (sist)</th><th class='text-right'>Puls</th></tr>";
 							if (res) {
 								var rows = res.resultSet;
 								console.log(rows);
 								for (var i in rows) {
-									results += "<tr><td>" + rows[i].datum.value + "</td><td class='text-right'>" + rows[i].temperatura.magnitude + " " + rows[i].temperatura.units + "</td>" +
+									var date = new Date(rows[i].datum.value);
+
+									var datum = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
+									var cas = date.getUTCHours() + ":" + date.getUTCMinutes();
+									//console.log("date: ",datum);
+									//console.log("time: ",cas);
+									results += "<tr><td>" + datum + "," + cas + "</td><td class='text-right'>" + rows[i].temperatura.magnitude + " " + rows[i].temperatura.units + "</td>" +
 										"<td class='text-right'>" + rows[i].diastolicen.magnitude + " " + rows[i].diastolicen.units + "</td>" +
 										"<td class='text-right'>" + rows[i].sistolicen.magnitude + " " + rows[i].sistolicen.units + "</td>" +
 									"<td class='text-right'>" + rows[i].puls.magnitude + " " + rows[i].puls.units + "</td></tr>";
@@ -347,15 +358,17 @@ $(document).ready(function() {
 		$("#dodajMeritveVitalnihZnakovSporocilo").html("");
 		var podatki = $(this).val().split("|");
 		$("#dodajVitalnoEHR").val(podatki[0]);
-		$("#dodajVitalnoDatumInUra").val(podatki[1]);
-		$("#dodajVitalnoTelesnaVisina").val(podatki[2]);
-		$("#dodajVitalnoTelesnaTeza").val(podatki[3]);
-		$("#dodajVitalnoTelesnaTemperatura").val(podatki[4]);
-		$("#dodajVitalnoKrvniTlakSistolicni").val(podatki[5]);
-		$("#dodajVitalnoKrvniTlakDiastolicni").val(podatki[6]);
-		$("#dodajVitalnoPuls").val(podatki[7]);
-		$("#dodajVitalnoNasicenostKrviSKisikom").val(podatki[8]);
-		$("#dodajVitalnoMerilec").val(podatki[9]);
+		$("#dodajVitalnoDatum").val(podatki[1]);
+		$("#dodajVitalnoUra").val(podatki[2]);
+		$("#dodajVitalnoMinute").val(podatki[3]);
+		$("#dodajVitalnoTelesnaVisina").val(podatki[4]);
+		$("#dodajVitalnoTelesnaTeza").val(podatki[5]);
+		$("#dodajVitalnoTelesnaTemperatura").val(podatki[6]);
+		$("#dodajVitalnoKrvniTlakSistolicni").val(podatki[7]);
+		$("#dodajVitalnoKrvniTlakDiastolicni").val(podatki[8]);
+		$("#dodajVitalnoPuls").val(podatki[9]);
+		$("#dodajVitalnoNasicenostKrviSKisikom").val(podatki[10]);
+		$("#dodajVitalnoMerilec").val(podatki[11]);
 	});
 	$('#preberiEhrIdZaVitalneZnake').change(function() {
 		$("#preberiMeritveVitalnihZnakovSporocilo").html("");
