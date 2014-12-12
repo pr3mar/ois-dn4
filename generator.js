@@ -1,10 +1,22 @@
 /**
  * Created by Марко on 11.12.2014.
  */
+var baseUrl = 'https://rest.ehrscape.com/rest/v1';
+var username = "ois.seminar";
+var password = "ois4fri";
+
+function getSessionId() {
+    var response = $.ajax({
+        type: "POST",
+        url: baseUrl + "/session?username=" + encodeURIComponent(username) +
+        "&password=" + encodeURIComponent(password),
+        async: false
+    });
+    return response.responseJSON.sessionId;
+}
 
 function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse, dateStart, dateEnd) {
-    // TODO generatePat 30 samples
-    // (is 30 enough?) depends on d3.js
+    // TODO (is 30 enough?) depends on d3.js
     var hh = 0;
     var raz = 4;
     var i = 0;
@@ -14,7 +26,7 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
     var blood1 = (varianceBlood1 > 10) ? 90 : 80;
     var blood2 = (varianceBlood1 > 10) ? 130 : 120;
     var pulse = (variancePulse > 20) ? 80 : 60;
-    console.log(temp,blood1, blood2, pulse);
+    //console.log(temp,blood1, blood2, pulse);
     while(dateStart.getTime() < dateEnd.getTime()) {
         var entry = {};
         entry.data = dateStart;
@@ -34,13 +46,13 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
         }
         results.push(entry);
         dateStart.setHours(dateStart.getHours() + raz)
-        console.log(entry);
+        //console.log(entry);
         i++;
     }
     return results;
 }
 
-function generate(name, patient) { // 1, 2, 3
+function generate(name, bday, patient) { // 1, 2, 3
     array = []; // JSON
     // equal dateStart for either case (randomly generated every time it is called)
     var day = Math.floor(Math.random()*31) + 1;
@@ -52,22 +64,22 @@ function generate(name, patient) { // 1, 2, 3
     }*/
     var hour = Math.floor(Math.random()*23) + 1;
     var min = Math.floor(Math.random()*59) + 1;
-    var dateStart = new Date(year, month, day, hour, min, 0);
+    var dateStart = new Date(year, month, day, hour, min, 0, 0);
     day += Math.floor(Math.random() * 7) + 3;
     hour = Math.floor(Math.random()*23) + 1;
     min = Math.floor(Math.random()*59) + 1;
-    var dateEnd = new Date(year, month, day, hour, min, 0);
-    console.log(dateStart, dateEnd);
+    var dateEnd = new Date(year, month, day, hour, min, 0, 0);
+    //console.log(dateStart, dateEnd);
     array.ime = name;
+    array.rojstniDan = bday;
     array.datumZacetek = dateStart;
     array.datumKonec = dateEnd;
     // blood1 = diastolic
     // blood2 = systolic
     var varianceTemp, varianceBlood1, varianceBlood2, variancePulse;
     switch (patient) {
-        //TODO check the variances!!!
         case 1: // fever
-            console.log(1);
+            //console.log(1);
             array.zdravilo = "Lecadol plus C";
             varianceTemp = 6;
             varianceBlood1 = 10;
@@ -81,7 +93,7 @@ function generate(name, patient) { // 1, 2, 3
             array.meritve = meritve;
             break;c
         case 2: // blood pressure
-            console.log(2);
+            //console.log(2);
             array.zdravilo = "Amlessa";
             varianceTemp = 2;
             varianceBlood1 = 30;
@@ -95,7 +107,7 @@ function generate(name, patient) { // 1, 2, 3
             array.meritve = meritve;
             break;
         case 3: // pulse
-            console.log(3);
+            //console.log(3);
             array.zdravilo = "Amiokordin";
             varianceTemp = 2;
             varianceBlood1 = 10;
@@ -114,8 +126,135 @@ function generate(name, patient) { // 1, 2, 3
     }
     return array;
 }
+
+function insertData(data) {
+    console.log(data);
+    sessionId = getSessionId();
+    var ehrID = "b931580f-2b05-488b-985b-8d9ffb08ad02";
+    //var ehrID = "63a03c16-c9ca-4554-93e3-416beda1286d";
+    if(!data.zdravilo || !data.datumKonec || !data.datumKonec) {
+        $("#error").append("error with data!");
+    } else {
+        var n_ = data.ime;
+        ime = n_.split(" ");
+        $.ajaxSetup({
+            headers: {"Ehr-Session": sessionId}
+        });
+        $.ajax({
+            url: baseUrl + "/ehr",
+            type: 'POST',
+            success: function (data_) {
+                ehrID = data_.ehrId;
+
+                var partyData = {
+                    firstNames: ime[0],
+                    lastNames: ime[1],
+                    dateOfBirth: data.rojstniDan,
+                    partyAdditionalInfo: [{key: "ehrID", value: ehrID}]
+                };
+                $.ajax({
+                    url: baseUrl + "/demographics/party",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(partyData),
+                    success: function (party) {
+                        if (party.action == 'CREATE') {
+                            $.ajaxSetup({
+                                headers: {"Ehr-Session": sessionId}
+                             });
+                            var podatki = {
+                                 "ctx/language": "en",
+                                 "ctx/territory": "SI",
+                                 "ctx/time": "2014-11-21T11:40Z",
+                                 "medications/medication_instruction/order/medicine": data.zdravilo,
+                                 //"medications/medication_instruction/order/dose": "6.0",
+                                 "medications/medication_instruction/narrative": "take medication every 8 hours",
+                                 "medications/medication_instruction/order/timing": "R1",
+                                 //"medications/medication_instruction/order/description": "dsgfdskjbgkjsdfgnsdfkjgnam;gbasjkbadfb;dflskb dfbjsdfjg dfg afglsdjgjsk",
+                                 "medications/medication_instruction/order/medication_timing/start_date":data.datumZacetek,
+                                 "medications/medication_instruction/order/medication_timing/stop_date":data.datumKonec
+                            };
+                            var parametriZahteve = {
+                                 ehrId: ehrID,
+                                 templateId: 'Medications',
+                                 format: 'FLAT'
+                            };
+                            $.ajax({
+                                 url: baseUrl + "/composition?" + $.param(parametriZahteve),
+                                 type: "POST",
+                                 contentType: "application/json",
+                                 data: JSON.stringify(podatki),
+                                 success: function (res) {
+                                    console.log("success:", res.meta.href);
+                                    //console.log(data.meritve);
+                                    console.log("uspesno kreiran EHR: " + ehrID);
+                                    for (entry in data.meritve) {
+                                        //console.log(ehrID);
+                                        var podatki = {
+                                            // Preview Structure: https://rest.ehrscape.com/rest/v1/template/Vital%20Signs/example
+                                            "ctx/language": "en",
+                                            "ctx/territory": "SI",
+                                            "ctx/time": new Date(),
+                                            "vital_signs/body_temperature/any_event/temperature|magnitude": data.meritve[entry].temperatura,
+                                            "vital_signs/body_temperature/any_event/temperature|unit": "°C",
+                                            "vital_signs/blood_pressure/any_event/systolic": data.meritve[entry].tlakSis,
+                                            "vital_signs/blood_pressure/any_event/diastolic": data.meritve[entry].tlakDias,
+                                            "vital_signs/pulse/any_event/rate|magnitude": data.meritve[entry].puls,
+                                            "vital_signs/pulse/any_event/rate|unit": "/min"
+                                        };
+                                        var parametriZahteve = {
+                                            "ehrId": ehrID,
+                                            templateId: 'Vital Signs',
+                                            format: 'FLAT'
+                                        };
+                                        $.ajax({
+                                            url: baseUrl + "/composition?" + $.param(parametriZahteve),
+                                            type: 'POST',
+                                            contentType: 'application/json',
+                                            data: JSON.stringify(podatki),
+                                            success: function (res) {
+                                                console.log(res.meta.href);
+                                                //$("#dodajMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-success fade-in'>" + res.meta.href + ".</span>");
+                                            },
+                                            error: function (err) {
+                                                //$("#dodajMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+                                                console.log(JSON.parse(err.responseText).userMessage);
+                                            }
+                                        });
+                                    }
+                                 },
+                                 error: function (err) {
+                                    console.log(err.responseText);
+                                 }
+                            });
+                         }
+                    },
+                    error: function (err) {
+                        console.log(JSON.parse(err.responseText));
+                    }
+                });
+            }
+        });
+    }
+}
+
+
 $(document).ready(function (){
-    var xx = generate("Marko", 3);
-    console.log(xx);
-    $("#gendata").append(JSON.stringify(xx));
+    var mer= [];
+    mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1)); // 1a7aa79c-02df-438f-9bbf-6c5351525f9c
+    mer.push(generate("Tone Oblak", new Date(1974, 7, 1), 2)); // 14e0c33d-c23f-4528-91ad-39fd3a880cce
+    mer.push(generate("Metka Polen", new Date(2000, 3, 14), 3)); // 65648fb0-9a1b-4d18-81ad-ba4dd67c3df2
+    insertData(mer[2]);
+    /*
+    console.log(mer[0],mer[1],mer[2]);
+    $("#gendata").append(JSON.stringify(mer[0].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[0].zdravilo) + "<br/>");
+    $("#gendata").append(JSON.stringify(mer[0].datumZacetek) + " - " + JSON.stringify(mer[0].datumKonec) + "<br/>");
+    $("#gendata").append(JSON.stringify(mer[0].meritve) + "<br/>");
+    $("#gendata").append("<br/>" + JSON.stringify(mer[1].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[1].zdravilo) + "<br/>");
+    $("#gendata").append(JSON.stringify(mer[1].datumZacetek) + " - " + JSON.stringify(mer[1].datumKonec) + "<br/>");
+    $("#gendata").append(JSON.stringify(mer[1].meritve) + "<br/>");
+    $("#gendata").append("<br/>" + JSON.stringify(mer[2].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[2].zdravilo) + "<br/>");
+    $("#gendata").append(JSON.stringify(mer[2].datumZacetek) + " - " + JSON.stringify(mer[2].datumKonec) + "<br/>");
+    $("#gendata").append(JSON.stringify(mer[2].meritve) + "<br/>");
+    */
 });

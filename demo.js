@@ -99,6 +99,7 @@ function dodajMeritveVitalnihZnakov() {
 	var min = $("#dodajVitalnoMinute").val();
 	//2014-11-21T11:40Z
 	datumInUra = datum + "T" + ura + ":" + min + "Z";
+	console.log(datumInUra);
 	var telesnaVisina = $("#dodajVitalnoTelesnaVisina").val();
 	var telesnaTeza = $("#dodajVitalnoTelesnaTeza").val();
 	var telesnaTemperatura = $("#dodajVitalnoTelesnaTemperatura").val();
@@ -363,14 +364,14 @@ $(document).ready(function() {
 		$("#dodajVitalnoDatum").val(podatki[1]);
 		$("#dodajVitalnoUra").val(podatki[2]);
 		$("#dodajVitalnoMinute").val(podatki[3]);
-		$("#dodajVitalnoTelesnaVisina").val(podatki[4]);
-		$("#dodajVitalnoTelesnaTeza").val(podatki[5]);
+		//$("#dodajVitalnoTelesnaVisina").val(podatki[4]);
+		//$("#dodajVitalnoTelesnaTeza").val(podatki[5]);
 		$("#dodajVitalnoTelesnaTemperatura").val(podatki[6]);
 		$("#dodajVitalnoKrvniTlakSistolicni").val(podatki[7]);
 		$("#dodajVitalnoKrvniTlakDiastolicni").val(podatki[8]);
 		$("#dodajVitalnoPuls").val(podatki[9]);
-		$("#dodajVitalnoNasicenostKrviSKisikom").val(podatki[10]);
-		$("#dodajVitalnoMerilec").val(podatki[11]);
+		//$("#dodajVitalnoNasicenostKrviSKisikom").val(podatki[10]);
+		//$("#dodajVitalnoMerilec").val(podatki[11]);
 	});
 	$('#preberiEhrIdZaVitalneZnake').change(function() {
 		$("#preberiMeritveVitalnihZnakovSporocilo").html("");
