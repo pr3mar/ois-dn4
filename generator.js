@@ -29,7 +29,7 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
     //console.log(temp,blood1, blood2, pulse);
     while(dateStart.getTime() < dateEnd.getTime()) {
         var entry = {};
-        entry.data = dateStart;
+        //console.log(entry.data);
        // console.log(i,dateStart);
         if(i % 2 == true) {
             entry.zdravilo = true;
@@ -44,8 +44,10 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
             entry.tlakSis = Math.floor(Math.random() * varianceBlood2) + blood2;
             entry.puls = Math.floor(Math.random() * variancePulse) + pulse;
         }
+        entry.data = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes(), 0, 0);
         results.push(entry);
-        dateStart.setHours(dateStart.getHours() + raz)
+        dateStart.setHours(dateStart.getHours() + raz);
+        //console.log(entry.data);
         //console.log(entry);
         i++;
     }
@@ -128,7 +130,7 @@ function generate(name, bday, patient) { // 1, 2, 3
 }
 
 function insertData(data) {
-    console.log(data);
+    //console.log(data);
     sessionId = getSessionId();
     var ehrID = "b931580f-2b05-488b-985b-8d9ffb08ad02";
     //var ehrID = "63a03c16-c9ca-4554-93e3-416beda1286d";
@@ -186,15 +188,17 @@ function insertData(data) {
                                  data: JSON.stringify(podatki),
                                  success: function (res) {
                                     console.log("success:", res.meta.href);
-                                    //console.log(data.meritve);
+                                    // console.log(data.meritve);
                                     console.log("uspesno kreiran EHR: " + ehrID);
+                                    $("#gendata").append("<div> Vnos dodan za: " + data.ime + ", z ehrID-jem: " + ehrID + "</div>");
+                                    // console.log(data.meritve);
                                     for (entry in data.meritve) {
-                                        //console.log(ehrID);
+                                        // console.log(data.meritve[entry].data);
                                         var podatki = {
                                             // Preview Structure: https://rest.ehrscape.com/rest/v1/template/Vital%20Signs/example
                                             "ctx/language": "en",
                                             "ctx/territory": "SI",
-                                            "ctx/time": new Date(),
+                                            "ctx/time": data.meritve[entry].data,
                                             "vital_signs/body_temperature/any_event/temperature|magnitude": data.meritve[entry].temperatura,
                                             "vital_signs/body_temperature/any_event/temperature|unit": "°C",
                                             "vital_signs/blood_pressure/any_event/systolic": data.meritve[entry].tlakSis,
@@ -241,10 +245,11 @@ function insertData(data) {
 
 $(document).ready(function (){
     var mer= [];
-    mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1)); // 1a7aa79c-02df-438f-9bbf-6c5351525f9c
-    mer.push(generate("Tone Oblak", new Date(1974, 7, 1), 2)); // 14e0c33d-c23f-4528-91ad-39fd3a880cce
-    mer.push(generate("Metka Polen", new Date(2000, 3, 14), 3)); // 65648fb0-9a1b-4d18-81ad-ba4dd67c3df2
-    insertData(mer[2]);
+    mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1)); // 4da990b8-a066-4b39-8d7b-a026312da57b
+    mer.push(generate("Tone Oblak", new Date(1974, 7, 1), 2)); // b5855ad0-7eae-4a8a-a762-70a333ec9fce
+    mer.push(generate("Metka Polen", new Date(2000, 3, 14), 3)); // 76160f51-92d8-4541-ae16-84fd887c4e8e
+    //console.log(mer[0].meritve);
+    //insertData(mer[0]);
     /*
     console.log(mer[0],mer[1],mer[2]);
     $("#gendata").append(JSON.stringify(mer[0].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[0].zdravilo) + "<br/>");
