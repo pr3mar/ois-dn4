@@ -242,7 +242,7 @@ function insertData(data) {
     }
 }
 
-
+/*
 $(document).ready(function (){
     var mer= [];
     mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1)); // 4da990b8-a066-4b39-8d7b-a026312da57b
@@ -254,7 +254,7 @@ $(document).ready(function (){
     drawGraphPuls(mer[2]);
     //console.log(mer[0].meritve);
     //insertData(mer[0]);
-    /*
+
     console.log(mer[0],mer[1],mer[2]);
     $("#gendata").append(JSON.stringify(mer[0].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[0].zdravilo) + "<br/>");
     $("#gendata").append(JSON.stringify(mer[0].datumZacetek) + " - " + JSON.stringify(mer[0].datumKonec) + "<br/>");
@@ -265,5 +265,6 @@ $(document).ready(function (){
     $("#gendata").append("<br/>" + JSON.stringify(mer[2].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[2].zdravilo) + "<br/>");
     $("#gendata").append(JSON.stringify(mer[2].datumZacetek) + " - " + JSON.stringify(mer[2].datumKonec) + "<br/>");
     $("#gendata").append(JSON.stringify(mer[2].meritve) + "<br/>");
-    */
+
 });
+*/
