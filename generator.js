@@ -248,6 +248,7 @@ $(document).ready(function (){
     mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1)); // 4da990b8-a066-4b39-8d7b-a026312da57b
     mer.push(generate("Tone Oblak", new Date(1974, 7, 1), 2)); // b5855ad0-7eae-4a8a-a762-70a333ec9fce
     mer.push(generate("Metka Polen", new Date(2000, 3, 14), 3)); // 76160f51-92d8-4541-ae16-84fd887c4e8e
+    drawGraph(mer[0]);
     //console.log(mer[0].meritve);
     //insertData(mer[0]);
     /*
