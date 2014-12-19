@@ -1,9 +1,14 @@
 /**
  * Created by Марко on 11.12.2014.
+ * Vnos dodan za: Janez Novak, z ehrID-jem: 5ea2885f-ba68-4824-9eb5-6b8dcc5a5f1e
+ * Vnos dodan za: Tone Oblak, z ehrID-jem: c110c81d-7fdb-45d8-9041-e2aa9233252d
+ * Vnos dodan za: Metka Polen, z ehrID-jem: fbd604da-ac73-4622-868a-3ccfdcd65874
  */
 var baseUrl = 'https://rest.ehrscape.com/rest/v1';
 var username = "ois.seminar";
 var password = "ois4fri";
+var mer= [];
+var counter = 0;
 
 function getSessionId() {
     var response = $.ajax({
@@ -27,7 +32,8 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
     var blood2 = (varianceBlood1 > 10) ? 130 : 120;
     var pulse = (variancePulse > 20) ? 80 : 60;
     //console.log(temp,blood1, blood2, pulse);
-    while(dateStart.getTime() < dateEnd.getTime()) {
+    var tmpDate = new Date(dateStart.getTime());
+    while(tmpDate.getTime() < dateEnd.getTime()) {
         var entry = {};
         //console.log(entry.data);
        // console.log(i,dateStart);
@@ -44,9 +50,9 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
             entry.tlakSis = Math.floor(Math.random() * varianceBlood2) + blood2;
             entry.puls = Math.floor(Math.random() * variancePulse) + pulse;
         }
-        entry.data = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes(), 0, 0);
+        entry.data = new Date(tmpDate.getTime());
         results.push(entry);
-        dateStart.setHours(dateStart.getHours() + raz);
+        tmpDate.setHours(tmpDate.getHours() + raz);
         //console.log(entry.data);
         //console.log(entry);
         i++;
@@ -67,15 +73,16 @@ function generate(name, bday, patient) { // 1, 2, 3
     var hour = Math.floor(Math.random()*23) + 1;
     var min = Math.floor(Math.random()*59) + 1;
     var dateStart = new Date(year, month, day, hour, min, 0, 0);
+    array.datumZacetek = dateStart;
     day += Math.floor(Math.random() * 7) + 3;
     hour = Math.floor(Math.random()*23) + 1;
     min = Math.floor(Math.random()*59) + 1;
     var dateEnd = new Date(year, month, day, hour, min, 0, 0);
-    //console.log(dateStart, dateEnd);
+    array.datumKonec = dateEnd;
+    console.log(dateStart, dateEnd);
     array.ime = name;
     array.rojstniDan = bday;
-    array.datumZacetek = dateStart;
-    array.datumKonec = dateEnd;
+
     // blood1 = diastolic
     // blood2 = systolic
     var varianceTemp, varianceBlood1, varianceBlood2, variancePulse;
@@ -129,16 +136,18 @@ function generate(name, bday, patient) { // 1, 2, 3
     return array;
 }
 
-function insertData(data) {
-    //console.log(data);
+function insertData(data, next) {
+    console.log(data);
     sessionId = getSessionId();
-    var ehrID = "b931580f-2b05-488b-985b-8d9ffb08ad02";
+    //var ehrID = "b931580f-2b05-488b-985b-8d9ffb08ad02";
+    var ehrID = "";
     //var ehrID = "63a03c16-c9ca-4554-93e3-416beda1286d";
     if(!data.zdravilo || !data.datumKonec || !data.datumKonec) {
         $("#error").append("error with data!");
     } else {
         var n_ = data.ime;
         ime = n_.split(" ");
+        console.log(ime);
         $.ajaxSetup({
             headers: {"Ehr-Session": sessionId}
         });
@@ -147,7 +156,7 @@ function insertData(data) {
             type: 'POST',
             success: function (data_) {
                 ehrID = data_.ehrId;
-
+                console.log(ehrID);
                 var partyData = {
                     firstNames: ime[0],
                     lastNames: ime[1],
@@ -226,6 +235,7 @@ function insertData(data) {
                                             }
                                         });
                                     }
+                                    next();
                                  },
                                  error: function (err) {
                                     console.log(err.responseText);
@@ -242,19 +252,29 @@ function insertData(data) {
     }
 }
 
-/*
+function theNext() {
+    if(counter < mer.length) {
+        counter++;
+        insertData(mer[counter], theNext);
+    } else {
+        console.log("finish");
+    }
+}
+
 $(document).ready(function (){
-    var mer= [];
-    mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1)); // 4da990b8-a066-4b39-8d7b-a026312da57b
-    mer.push(generate("Tone Oblak", new Date(1974, 7, 1), 2)); // b5855ad0-7eae-4a8a-a762-70a333ec9fce
-    mer.push(generate("Metka Polen", new Date(2000, 3, 14), 3)); // 76160f51-92d8-4541-ae16-84fd887c4e8e
+
+    mer.push(generate("Janez Novak", new Date(1990, 11, 25), 1));   // 4da990b8-a066-4b39-8d7b-a026312da57b ;
+    mer.push(generate("Tone Oblak", new Date(1974, 7, 1), 2));      // b5855ad0-7eae-4a8a-a762-70a333ec9fce ;
+    mer.push(generate("Metka Polen", new Date(2000, 3, 14), 3));    // 76160f51-92d8-4541-ae16-84fd887c4e8e ;
+    //console.log(mer[0].datumZacetek, mer[0].datumKonec);
+    //insertData(mer[0], theNext);
     drawGraphTemp(mer[2]);
     drawGraphTlakSis(mer[2]);
     drawGraphTlakDia(mer[2]);
     drawGraphPuls(mer[2]);
     //console.log(mer[0].meritve);
     //insertData(mer[0]);
-
+/*
     console.log(mer[0],mer[1],mer[2]);
     $("#gendata").append(JSON.stringify(mer[0].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[0].zdravilo) + "<br/>");
     $("#gendata").append(JSON.stringify(mer[0].datumZacetek) + " - " + JSON.stringify(mer[0].datumKonec) + "<br/>");
@@ -265,6 +285,5 @@ $(document).ready(function (){
     $("#gendata").append("<br/>" + JSON.stringify(mer[2].ime) + ", rojstni dan: " + JSON.stringify(mer[0].rojstniDan) + ", zdravilo: " + JSON.stringify(mer[2].zdravilo) + "<br/>");
     $("#gendata").append(JSON.stringify(mer[2].datumZacetek) + " - " + JSON.stringify(mer[2].datumKonec) + "<br/>");
     $("#gendata").append(JSON.stringify(mer[2].meritve) + "<br/>");
-
+    */
 });
-*/
