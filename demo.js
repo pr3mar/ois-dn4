@@ -191,6 +191,116 @@ function getFormattedDate(date) {
     return datum + ", " + cas;
 }
 
+function izpisZdravila(ehrId, datumZac, datumKon) {
+    //console.log("zdravila!");
+    $("#preberiSporocilo").empty();
+    $("#rezultatiEHR").empty();
+    console.log(ehrId, datumZac, datumKon);
+    sessionId = getSessionId();
+    if(datumZac == undefined && datumKon == undefined) {
+        var AQL =
+            "select " +
+            "a_a/activities[at0001]/description[at0002]/items[at0003]/value as zdravilo, " +
+            "a_a/activities[at0001]/description[at0002]/items[at0010, 'Medication timing']/items[at0012]/value as startDate, " +
+            "a_a/activities[at0001]/description[at0002]/items[at0010, 'Medication timing']/items[at0013]/value as endDate " +
+            "from EHR e[e/ehr_id/value='" + ehrId + "'] " +
+            "contains COMPOSITION a " +
+            "contains INSTRUCTION a_a[openEHR-EHR-INSTRUCTION.medication.v1] " +
+            "offset 0 limit 10";
+        //console.log(AQL);
+        $.ajax({
+            url: baseUrl + "/query?" + $.param({"aql": AQL}),
+            type: 'GET',
+            headers: {"Ehr-Session": sessionId},
+            success: function (res) {
+                var results = "<table class='table table-striped table-hover'><tr><th>Ime zdravila</th><th class='text-right'>Datum zacetek</th><th class='text-right'>Datum konec</th></tr>";
+                if (res) {
+                    var rows = res.resultSet;
+                    //console.log(rows[0].startDate.value);
+                    for (var i in rows) {
+                        var dateStart, datumStart, casStart;
+                        if (rows[i].startDate != null) {
+                            dateStart = new Date(rows[i].startDate.value);
+                            datumStart = dateStart.getDate() + "." + (dateStart.getMonth() + 1) + "." + dateStart.getFullYear();
+                            casStart = dateStart.getUTCHours() + ":" + dateStart.getUTCMinutes();
+                        } else {
+                            dateStart = "";
+                            datumStart = "";
+                            casStart = "";
+                        }
+                        var dateEnd, datumEnd, casEnd;
+                        if (rows[i].endDate != null) {
+                            dateEnd = new Date(rows[i].endDate.value);
+                            datumEnd = dateEnd.getDate() + "." + (dateEnd.getMonth() + 1) + "." + dateEnd.getFullYear();
+                            casEnd = dateEnd.getUTCHours() + ":" + dateEnd.getUTCMinutes();
+                        } else {
+                            dateEnd = "";
+                            datumEnd = "";
+                            casEnd = "";
+                        }
+                        //onclick='console.log(\"click\")'><td id='zdravilo' value='" + ehrId + "'
+                        results += "<tr onclick=\"izpisZdravila('" + ehrId + "', '" + dateStart + "', '" + dateEnd + "')\" style=\"cursor: pointer;\">" +
+                        "<td>" + rows[i].zdravilo.value + "</td><td  class='text-right'>" + datumStart + ", " + casStart + "</td><td  class='text-right'>" + datumEnd + ", " + casEnd + "</td></tr>";
+                    }
+                    results += "</table>";
+                    $("#rezultatiEHR").append(results);
+                } else {
+                    $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
+                }
+            },
+            error: function (err) {
+                $("#preberiSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+                console.log(JSON.parse(err.responseText).userMessage);
+            }
+        });
+    } else {
+        var zdrStart = new Date(datumZac);
+        var zdrEnd = new Date(datumKon);
+        var where = (datumZac == undefined && datumKon == undefined) ? "" : " where a_a/data[at0002]/origin/value>='" + zdrStart.toISOString() + "' and  a_a/data[at0002]/origin/value<='" + zdrEnd.toISOString() + "'";
+        var AQL = "select " +
+            "a_a/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value as temperatura, " +
+            "a_b/data[at0001]/events[at0006]/data[at0003]/items[at0005]/value as diastolicen, " +
+            "a_b/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value as sistolicen, " +
+            "a_c/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value as puls, " +
+            "a_a/data[at0002]/origin as datum " +
+            "from EHR e[ehr_id/value='" + ehrId + "'] " +
+            "contains COMPOSITION a " +
+            "contains ( " +
+            "OBSERVATION a_a[openEHR-EHR-OBSERVATION.body_temperature.v1] and " +
+            "OBSERVATION a_b[openEHR-EHR-OBSERVATION.blood_pressure.v1] and " +
+            "OBSERVATION a_c[openEHR-EHR-OBSERVATION.heart_rate-pulse.v1]) " +
+            where +
+            " order by a_a/data[at0002]/origin";
+        //console.log(AQL);
+        $.ajax({
+            url: baseUrl + "/query?" + $.param({"aql": AQL}),
+            type: 'GET',
+            headers: {"Ehr-Session": sessionId},
+            success: function (res) {
+                var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th class='text-right'>Tlak (dias)</th><th class='text-right'>Tlak (sist)</th><th class='text-right'>Puls</th></tr>";
+                if (res) {
+                    var rows = res.resultSet;
+                    //console.log(rows.length);
+                    for (var i in rows) {
+                        results += "<tr><td>" + getFormattedDate(new Date(rows[i].datum.value)) + "</td><td class='text-right'>" + Math.round(rows[i].temperatura.magnitude * 100)/100 + " " + rows[i].temperatura.units + "</td>" +
+                        "<td class='text-right'>" + rows[i].diastolicen.magnitude + " " + rows[i].diastolicen.units + "</td>" +
+                        "<td class='text-right'>" + rows[i].sistolicen.magnitude + " " + rows[i].sistolicen.units + "</td>" +
+                        "<td class='text-right'>" + rows[i].puls.magnitude + " " + rows[i].puls.units + "</td></tr>";
+                    }
+                    results += "</table>";
+                    $("#rezultatiEHR").append(results);
+                } else {
+                    $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
+                }
+            },
+            error: function (err) {
+                $("#preberiSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+                console.log(JSON.parse(err.responseText).userMessage);
+            }
+        });
+    }
+}
+
 function preberiMeritveVitalnihZnakov(tipForced, ehrIDForced, zdraviloForced, zdrStart, zdrEnd) {
     //console.log(tipForced, ehrIDForced, zdraviloForced, zdrStart, zdrEnd);
     sessionId = getSessionId();
@@ -348,63 +458,6 @@ function preberiMeritveVitalnihZnakov(tipForced, ehrIDForced, zdraviloForced, zd
                                     "<td class='text-right'>" + rows[i].sistolicen.magnitude + " " + rows[i].sistolicen.units + "</td>" +
                                     "<td class='text-right'>" + rows[i].puls.magnitude + " " + rows[i].puls.units + "</td></tr>";
                                 }
-                                results += "</table>";
-                                $("#rezultatMeritveVitalnihZnakov").append(results);
-                            } else {
-                                $("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
-                            }
-                        },
-                        error: function (err) {
-                            $("#preberiMeritveVitalnihZnakovSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
-                            console.log(JSON.parse(err.responseText).userMessage);
-                        }
-                    });
-                } else if (tip == "zdravila") {
-                    //console.log("zdravila!");
-                    var AQL =
-                        "select " +
-                        "a_a/activities[at0001]/description[at0002]/items[at0003]/value as zdravilo, " +
-                        "a_a/activities[at0001]/description[at0002]/items[at0010, 'Medication timing']/items[at0012]/value as startDate, " +
-                        "a_a/activities[at0001]/description[at0002]/items[at0010, 'Medication timing']/items[at0013]/value as endDate " +
-                        "from EHR e[e/ehr_id/value='" + ehrId + "'] " +
-                        "contains COMPOSITION a " +
-                        "contains INSTRUCTION a_a[openEHR-EHR-INSTRUCTION.medication.v1] " +
-                        "offset 0 limit 10";
-                    //console.log(AQL);
-                    $.ajax({
-                        url: baseUrl + "/query?" + $.param({"aql":AQL}),
-                        type: 'GET',
-                        headers: {"Ehr-Session": sessionId},
-                        success: function (res) {
-                            var results = "<table class='table table-striped table-hover'><tr><th>Ime zdravila</th><th class='text-right'>Datum zacetek</th><th class='text-right'>Datum konec</th></tr>";
-                            if(res) {
-                                var rows = res.resultSet;
-                                //console.log(rows[0].startDate.value);
-                                for (var i in rows) {
-                                    var dateStart, datumStart, casStart;
-                                    if(rows[i].startDate != null) {
-                                        dateStart = new Date(rows[i].startDate.value);
-                                        datumStart = dateStart.getDate() + "." + (dateStart.getMonth() + 1) + "." + dateStart.getFullYear();
-                                        casStart = dateStart.getUTCHours() + ":" + dateStart.getUTCMinutes();
-                                    } else {
-                                        dateStart = "";
-                                        datumStart = "";
-                                        casStart = "";
-                                    }
-                                    var dateEnd, datumEnd, casEnd;
-                                    if(rows[i].endDate != null) {
-                                        dateEnd = new Date(rows[i].endDate.value);
-                                        datumEnd = dateEnd.getDate() + "." + (dateEnd.getMonth() + 1) + "." + dateEnd.getFullYear();
-                                        casEnd = dateEnd.getUTCHours() + ":" + dateEnd.getUTCMinutes();
-                                    } else {
-                                        dateEnd = "";
-                                        datumEnd = "";
-                                        casEnd = "";
-                                    }
-                                    //onclick='console.log(\"click\")'><td id='zdravilo' value='" + ehrId + "'
-                                    results += "<tr onclick=\"preberiMeritveVitalnihZnakov('vse podatke','" + ehrId + "','" + rows[i].zdravilo.value + "', '" + dateStart + "', '" + dateEnd + "')\" style=\"cursor: pointer;\">" +
-                                    "<td>" + rows[i].zdravilo.value + "</td><td  class='text-right'>" + datumStart + ", " + casStart + "</td><td  class='text-right'>" + datumEnd + ", " + casEnd + "</td></tr>";
-                            }
                                 results += "</table>";
                                 $("#rezultatMeritveVitalnihZnakov").append(results);
                             } else {
