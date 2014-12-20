@@ -20,7 +20,7 @@ function getSessionId() {
 
 function dodajNoviPacijentDropDown(ime, priimek, ehrId) {
     $("#preberiObstojeciVitalniZnak").append("<option value='" + ehrId + "' selected>" + ime + " " + priimek + "</option>");
-    $("#preberiObstojeciEHR").append("<option value='" + ehrId + "'>" + ime + " " + priimek + "</option>");
+    $("#bolnikiEHR").append("<li role=\"presentation\"><a role=\"menuitem\" tabindex=\"-1\" href=\"#\">"+ime +" "+ priimek +"</a></li>");
     $("#preberiEhrIdZaVitalneZnake").append("<option value='" + ehrId + "'>" + ime + " " + priimek + "</option>");
 }
 
@@ -105,11 +105,11 @@ function preberiEHRodBolnika() {
             headers: {"Ehr-Session": sessionId},
             success: function (data) {
                 var party = data.party;
-                $("#preberiSporocilo").html("<span class='obvestilo label label-success fade-in'>Bolnik '" + party.firstNames + " " + party.lastNames + "', ki se je rodil '" + getFormattedDate(new Date(party.dateOfBirth)) + "'.</span>");
+                $("#preberiSporocilo").html("<br/><span class='label label-success fade-in'>Bolnik '" + party.firstNames + " " + party.lastNames + "', ki se je rodil '" + getFormattedDate(new Date(party.dateOfBirth)) + "'.</span>");
                 console.log("Bolnik '" + party.firstNames + " " + party.lastNames + "', ki se je rodil '" + party.dateOfBirth + "'.");
             },
             error: function (err) {
-                $("#preberiSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+                $("#preberiSporocilo").html("<br/><span class='label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
                 console.log(JSON.parse(err.responseText).userMessage);
             }
         });
@@ -235,7 +235,7 @@ function preberiMeritveVitalnihZnakov(tipForced, ehrIDForced, zdraviloForced, zd
                             if (res) {
                                 var rows = res.resultSet;
                                 for (var i in rows) {
-                                    results += "<tr><td>" + getFormattedDate(new Date(rows[i].cas)) + "</td><td class='text-right'>" + rows[i].temperatura_vrednost + " " + rows[i].temperatura_enota + "</td>";
+                                    results += "<tr><td>" + getFormattedDate(new Date(rows[i].cas)) + "</td><td class='text-right'>" + Math.round(rows[i].temperatura_vrednost *100)/100 + " " + rows[i].temperatura_enota + "</td>";
                                 }
                                 results += "</table>";
                                 $("#rezultatMeritveVitalnihZnakov").append(results);
@@ -464,4 +464,5 @@ $(document).ready(function () {
         $("#rezultatMeritveVitalnihZnakov").html("");
         $("#meritveVitalnihZnakovEHRid").val($(this).val());
     });
+
 });
