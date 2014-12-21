@@ -39,7 +39,7 @@ function displayMessage(temp, puls, sis, dia) {
     }
     $("#lekarneAdvise").empty();
     if(msg == "") {
-        $("#lekarneAdvise").append("<div class=\"alert alert-success\" role=\"alert\"><b>Super!</b> Ni več bolezni!</div>");
+        $("#lekarneAdvise").append("<div class=\"alert alert-success\" role=\"alert\"><b>Super!</b> Ni več bolezni! Ampak še vedno si lahko kupite vitamine v lekarno :)</div>");
     } else if (count <= 2) {
         $("#lekarneAdvise").append("<div class=\"alert alert-warning\" role=\"alert\"><b>Pozor!</b> Vaši vitalni znaki ne izgledajo najboljše.</div>");
     } else {
