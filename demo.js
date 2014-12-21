@@ -311,6 +311,11 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                     }
                     results += "</table>";
                     $("#rezultatiEHR").append(results);
+                    var x = $("#narisiGraf").is(':checked');
+                    if(x == true) {
+                        document.getElementById("narisiGraf").click();
+                    }
+                    document.getElementById("narisiGraf").disabled = true;
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
                 }
@@ -360,6 +365,7 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                     drawGraphTlakSis(rows);
                     drawGraphTlakDia(rows);
                     drawGraphPuls(rows);
+                    $("#narisiGraf").removeAttr("disabled");
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
                 }
