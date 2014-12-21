@@ -7,8 +7,8 @@ dimX = 600; dimY = 350;
 function drawGraphPuls(patient) {
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = dimX - margin.left - margin.right,
-        height = dimY - margin.top - margin.bottom;
+        width = $("#getH").width() - margin.left - margin.right,
+        height = $("#getH").height() - margin.top - margin.bottom;
 
     //var parseDate = d3.time.format("%a %b %d %Y %H:%M:%S %Z").parse;
     var iso = d3.time.format.utc("%Y-%m-%dT%H:%M:%S.%LZ").parse;
@@ -79,8 +79,8 @@ function drawGraphPuls(patient) {
 function drawGraphTlakSis(patient) {
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = dimX - margin.left - margin.right,
-        height = dimY - margin.top - margin.bottom;
+        width = $("#getH").width() - margin.left - margin.right,
+        height = $("#getH").height() - margin.top - margin.bottom;
 
     //var parseDate = d3.time.format("%a %b %d %Y %H:%M:%S %Z").parse;
     var iso = d3.time.format.utc("%Y-%m-%dT%H:%M:%S.%LZ").parse;
@@ -151,8 +151,8 @@ function drawGraphTlakSis(patient) {
 function drawGraphTlakDia(patient) {
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = dimX - margin.left - margin.right,
-        height = dimY - margin.top - margin.bottom;
+        width = $("#getH").width() - margin.left - margin.right,
+        height = $("#getH").height() - margin.top - margin.bottom;
 
     //var parseDate = d3.time.format("%a %b %d %Y %H:%M:%S %Z").parse;
     var iso = d3.time.format.utc("%Y-%m-%dT%H:%M:%S.%LZ").parse;
@@ -224,9 +224,9 @@ function drawGraphTlakDia(patient) {
 function drawGraphTemp(patient) {
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = dimX - margin.left - margin.right,
-        height = dimY - margin.top - margin.bottom;
-
+        width = $("#getH").width() - margin.left - margin.right,
+        height = $("#getH").height() - margin.top - margin.bottom;
+    console.log(width, height);
     //var parseDate = d3.time.format("%a %b %d %Y %H:%M:%S %Z").parse;
     var iso = d3.time.format.utc("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 
@@ -260,8 +260,8 @@ function drawGraphTemp(patient) {
     var data = [];
     //console.log(patient);
     patient.forEach(function (d) {
-        console.log("d");
-        console.log(d);
+        //console.log("d");
+        //console.log(d);
         var entry = {};
         entry.date = iso(new Date(d.datum.value).toISOString());
         entry.close = +d.temperatura.magnitude;
