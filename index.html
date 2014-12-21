@@ -6,9 +6,11 @@
 	    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
 	    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
 	    <script src="demo.js"></script>
 		<script src="generator.js"></script>
 		<script src="lekarne.js"></script>
+		<script type="text/javascript" src="getLocation.js"></script>
 		<link href="datepicker3.css" rel="stylesheet">
 		<script src="bootstrap-datepicker.js"></script>
 	    <style>
@@ -82,7 +84,7 @@
 					<div class="panel-heading">
 						<div class="row">
 							<div class="col-lg-8 col-md-8 col-md-8"><b>Vnos</b> meritve <b>vitalnih znakov</b> bolnika</div>
-							<div class="col-lg-4 col-md-4 col-md-4"><select class="form-control input-sm" id="preberiObstojeciVitalniZnak"><option value=""></option><option value="b931580f-2b05-488b-985b-8d9ffb08ad02|2014-11-21|11|40|185|80.0|36.50|118|92|75|98|medicinska sestra Smrketa">Ata Smrk</option></select></div>
+							<div class="col-lg-4 col-md-4 col-md-4"><select class="form-control input-sm" id="preberiObstojeciVitalniZnak"><option value=""><option value="6a3a47e2-59b6-471e-a076-26b7e8540ba0|2014-1-11|12|40|185|80.0|36.50|130|100|90|98|medicinska sestra Smrketa">Janez Novak</option><option value="b006f48d-84a4-43ab-a15b-29a4aa4fd742|2014-11-21|11|40|185|80.0|36.50|118|92|75|98|medicinska sestra Smrketa">Tone Oblak</option><option value="e7932a9f-3a0f-4fb3-a0c0-9bbb0988cbdc|2014-11-21|11|40|185|80.0|36.50|118|92|75|98|medicinska sestra Smrketa">Metka Polen</option></select></div>
 						</div>
 					</div>
 					<div class="panel-body">
@@ -110,7 +112,6 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
 		<div class="row">
 			<div class="col-lg-6 col-md-6 col-sm-6">
@@ -172,12 +173,25 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-6 col-md-6 col-sm-6">
+			<div class="col-lg-6 col-md-6 col-sm-6" id="lekarne" style="display: none;">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-lg-8 col-md-8 col-md-8"><b>Lekarne</b> v bližini</div>
+						</div>
+					</div>
+					<div class="panel-body">
+						<div id="map-canvas" style="margin:0px;padding:0px;height: 400px; width: 500px"></div>
+						<div id="error"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 pull-right">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="row">
 							<div class="col-lg-6 col-md-6 col-sm-6"><b>Pregled</b> meritev <b>vitalnih znakov</b> bolnika</div>
-							<div class="col-lg-3 col-md-3 col-sm-3"><select class="form-control input-sm" id="preberiTipZaVitalneZnake"><option value="telesna temperatura">telesna temperatura</option><!--<option value="telesna temperatura AQL">telesna temperatura (filter na podhladitev)</option><option value="telesna teža">telesna teža</option>--><option value="tlak">kvni tlak</option> <option value="puls">srčni utrip</option><option value="zdravila">zdravila</option><!--<option value="vse podatke">vse</option>--></select></div>
+							<div class="col-lg-3 col-md-3 col-sm-3"><select class="form-control input-sm" id="preberiTipZaVitalneZnake"><option value="telesna temperatura">telesna temperatura</option><!--<option value="telesna temperatura AQL">telesna temperatura (filter na podhladitev)</option><option value="telesna teža">telesna teža</option>--><option value="tlak">kvni tlak</option> <option value="puls">srčni utrip</option><!--<option value="zdravila">zdravila</option><option value="vse podatke">vse</option>--></select></div>
 							<div class="col-lg-3 col-md-3 col-sm-3"><select class="form-control input-sm" id="preberiEhrIdZaVitalneZnake"><option value=""></option><option value="6a3a47e2-59b6-471e-a076-26b7e8540ba0">Janez Novak</option><option value="b006f48d-84a4-43ab-a15b-29a4aa4fd742">Tone Oblak</option><option value="e7932a9f-3a0f-4fb3-a0c0-9bbb0988cbdc">Metka Polen</option></select></div>
 						</div>
 					</div>
@@ -189,6 +203,7 @@
 				</div>			
 			</div>
 		</div>
+
 		<script src="http://d3js.org/d3.v3.js"></script>
 		<script src="graph.js"></script>
 		<script>

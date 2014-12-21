@@ -226,7 +226,7 @@ function drawGraphTemp(patient) {
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = $("#getH").width() - margin.left - margin.right,
         height = $("#getH").height() - margin.top - margin.bottom;
-    console.log(width, height);
+    //console.log(width, height);
     //var parseDate = d3.time.format("%a %b %d %Y %H:%M:%S %Z").parse;
     var iso = d3.time.format.utc("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 

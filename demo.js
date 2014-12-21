@@ -316,6 +316,7 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                         document.getElementById("narisiGraf").click();
                     }
                     document.getElementById("narisiGraf").disabled = true;
+                    $("#lekarne").css("display","none");
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
                 }
@@ -366,6 +367,13 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                     drawGraphTlakDia(rows);
                     drawGraphPuls(rows);
                     $("#narisiGraf").removeAttr("disabled");
+                    var dia = rows[rows.length - 1].diastolicen.magnitude;
+                    var sis = rows[rows.length - 1].sistolicen.magnitude;
+                    var temp = rows[rows.length - 1].temperatura.magnitude;
+                    var puls = rows[rows.length - 1].puls.magnitude;
+                    if(temp > 36.5 || puls > 100 || puls < 40 || sis > 120 || dia > 90){
+                        $("#lekarne").css("display","inline");
+                    }
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
                 }
