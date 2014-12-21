@@ -3,7 +3,7 @@
  */
 
 var dimX, dimY;
-dimX = 400; dimY = 250;
+dimX = 600; dimY = 350;
 function drawGraphPuls(patient) {
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -34,17 +34,17 @@ function drawGraphPuls(patient) {
         .y(function (d) {
             return y(d.close);
         });
-
-    var svg = d3.select("#graphPuls").append("svg")
+    $("#grafPuls").empty();
+    var svg = d3.select("#grafPuls").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var data = [];
-    patient.meritve.forEach(function (d) {
+    patient.forEach(function (d) {
         var entry = {};
-        entry.date = iso(d.data.toISOString());
-        entry.close = +d.puls;
+        entry.date = iso(new Date(d.datum.value).toISOString());
+        entry.close = +d.puls.magnitude;
         data.push(entry);
     });
     //console.log(data);
@@ -106,17 +106,17 @@ function drawGraphTlakSis(patient) {
         .y(function (d) {
             return y(d.close);
         });
-
-    var svg = d3.select("#graphTlakSis").append("svg")
+    $("#grafSis").empty();
+    var svg = d3.select("#grafSis").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var data = [];
-    patient.meritve.forEach(function (d) {
+    patient.forEach(function (d) {
         var entry = {};
-        entry.date = iso(d.data.toISOString());
-        entry.close = +d.tlakSis;
+        entry.date = iso(new Date(d.datum.value).toISOString());
+        entry.close = +d.sistolicen.magnitude;
         data.push(entry);
     });
     //console.log(data);
@@ -178,17 +178,17 @@ function drawGraphTlakDia(patient) {
         .y(function (d) {
             return y(d.close);
         });
-
-    var svg = d3.select("#graphTlakDias").append("svg")
+    $("#grafDia").empty();
+    var svg = d3.select("#grafDia").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var data = [];
-    patient.meritve.forEach(function (d) {
+    patient.forEach(function (d) {
         var entry = {};
-        entry.date = iso(d.data.toISOString());
-        entry.close = +d.tlakDias;
+        entry.date = iso(new Date(d.datum.value).toISOString());
+        entry.close = +d.diastolicen.magnitude;
         data.push(entry);
     });
     //console.log(data);
@@ -251,17 +251,20 @@ function drawGraphTemp(patient) {
         .y(function (d) {
             return y(d.close);
         });
-
-    var svg = d3.select("#graphTemp").append("svg")
+    $("#grafTemp").empty();
+    var svg = d3.select("#grafTemp").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var data = [];
-    patient.meritve.forEach(function (d) {
+    //console.log(patient);
+    patient.forEach(function (d) {
+        console.log("d");
+        console.log(d);
         var entry = {};
-        entry.date = iso(d.data.toISOString());
-        entry.close = +d.temperatura;
+        entry.date = iso(new Date(d.datum.value).toISOString());
+        entry.close = +d.temperatura.magnitude;
         data.push(entry);
     });
     //console.log(data);

@@ -146,6 +146,28 @@
 						<div id="podatkiBolnika"></div>
 						<span id="preberiSporocilo"></span>
 						<div id="rezultatiEHR"></div>
+						<div id="tabi" style="display: none">
+							<ul class="nav nav-tabs" role="tablist" id="myTab">
+								<li role="presentation" class="active"><a href="#grafTemp" aria-controls="grafTemp" role="tab" data-toggle="tab">Telesna temperatura</a></li>
+								<li role="presentation"><a href="#grafSis" aria-controls="grafSis" role="tab" data-toggle="tab">Sistolični tlak</a></li>
+								<li role="presentation"><a href="#grafDia" aria-controls="grafDia" role="tab" data-toggle="tab">Diastolični tlak</a></li>
+								<li role="presentation"><a href="#grafPuls" aria-controls="grafPuls" role="tab" data-toggle="tab">Srčni utrip</a></li>
+							</ul>
+
+							<div class="tab-content">
+								<div role="tabpanel" class="tab-pane fade in active" id="grafTemp">Tab 1</div>
+								<div role="tabpanel" class="tab-pane fade" id="grafSis">Tab 2</div>
+								<div role="tabpanel" class="tab-pane fade" id="grafDia">Tab 3</div>
+								<div role="tabpanel" class="tab-pane fade" id="grafPuls">Tab 4</div>
+							</div>
+
+							<script>
+								$('#myTab a').click(function (e) {
+									e.preventDefault()
+									$(this).tab('show')
+								})
+							</script>
+						</div>
 					</div>
 				</div>
 			</div>

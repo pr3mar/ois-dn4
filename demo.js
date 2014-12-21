@@ -347,7 +347,7 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                 var results = "<table class='table table-striped table-hover'><tr><th>Datum in ura</th><th class='text-right'>Temperatura</th><th class='text-right'>Tlak (dias)</th><th class='text-right'>Tlak (sist)</th><th class='text-right'>Puls</th></tr>";
                 if (res) {
                     var rows = res.resultSet;
-                    //console.log(rows.length);
+                    console.log(rows);
                     for (var i in rows) {
                         results += "<tr><td>" + getFormattedDate(new Date(rows[i].datum.value)) + "</td><td class='text-right'>" + Math.round(rows[i].temperatura.magnitude * 100)/100 + " " + rows[i].temperatura.units + "</td>" +
                         "<td class='text-right'>" + rows[i].diastolicen.magnitude + " " + rows[i].diastolicen.units + "</td>" +
@@ -356,6 +356,10 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                     }
                     results += "</table>";
                     $("#rezultatiEHR").append(results);
+                    drawGraphTemp(rows);
+                    drawGraphTlakSis(rows);
+                    drawGraphTlakDia(rows);
+                    drawGraphPuls(rows);
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
                 }
@@ -584,5 +588,8 @@ $(document).ready(function () {
         $("#rezultatMeritveVitalnihZnakov").html("");
         $("#meritveVitalnihZnakovEHRid").val($(this).val());
     });
-
+    $("#narisiGraf").click(function (e){
+        $("#tabi").toggle(this.checked);
+        $("#rezultatiEHR").toggle(!this.checked);
+    })
 });
