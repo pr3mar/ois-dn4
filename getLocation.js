@@ -148,6 +148,7 @@ function loadScript() {
     //script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDG1IAlHePQfpdRiRkWlDzAja6q2_BTF1M'
     'callback=initialize';
     //document.body.appendChild(script);
+
     initialize();
 }
 
