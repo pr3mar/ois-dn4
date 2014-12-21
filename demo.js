@@ -18,6 +18,36 @@ function getSessionId() {
     return response.responseJSON.sessionId;
 }
 
+function displayMessage(temp, puls, sis, dia) {
+    var msg = "";
+    var count = 0;
+    if(temp > 36.5) {
+        msg += "telesna temperatura";
+        count++;
+    }
+    if(puls > 100 || puls < 40) {
+        msg += ", srčni utrip";
+        count++;
+    }
+    if(dia > 90) {
+        msg += ", diastolični krvni tlak";
+        count++;
+    }
+    if(sis > 120) {
+        msg += ", sistolični krvni tlak";
+        count++;
+    }
+    $("#lekarneAdvise").empty();
+    if(msg == "") {
+        $("#lekarneAdvise").append("<div class=\"alert alert-success\" role=\"alert\"><b>Super!</b> Ni več bolezni!</div>");
+    } else if (count <= 2) {
+        $("#lekarneAdvise").append("<div class=\"alert alert-warning\" role=\"alert\"><b>Pozor!</b> Vaši vitalni znaki ne izgledajo najboljše.</div>");
+    } else {
+        $("#lekarneAdvise").append("<div class=\"alert alert-danger\" role=\"alert\"><b>Nevarnost!</b> Čimprej pojdite v lekarno ali k zdravniku.</div>");
+    }
+
+}
+
 function getFormattedDate(date) {
     var datum = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
     var ura = (date.getUTCHours().toString().length == 1) ? "0" + date.getUTCHours() : date.getUTCHours();
@@ -378,6 +408,10 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                         var center = map.getCenter();
                         google.maps.event.trigger(map, "resize");
                         map.setCenter(center);
+                        displayMessage(temp, puls, sis, dia);
+                    } else {
+                        $("#lekarne").css("display","inline");
+                        displayMessage(temp, puls, sis, dia);
                     }
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
