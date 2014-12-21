@@ -131,8 +131,8 @@ function showError(err) {
 }
 
 function initialize() {
-    $("#map-canvas").width($("#getH").width());
-    $("#map-canvas").height($("#getH").height());
+    /*$("#map-canvas").width($("#getH").width());
+    $("#map-canvas").height($("#getH").height());*/
     var mapOptions = {
         zoom: 12,
         center: new google.maps.LatLng(46.057184, 14.506865)
