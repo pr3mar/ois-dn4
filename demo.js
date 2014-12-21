@@ -19,6 +19,12 @@ function getSessionId() {
 }
 
 function displayMessage(temp, puls, sis, dia) {
+    $("#lekarne").css("display","inline");
+    $("#map-canvas").width($("#getH").width());
+    $("#map-canvas").height($("#getH").height());
+    var center = map.getCenter();
+    google.maps.event.trigger(map, "resize");
+    map.setCenter(center);
     var msg = "";
     var count = 0;
     if(temp > 36.5) {
@@ -41,7 +47,7 @@ function displayMessage(temp, puls, sis, dia) {
     if(msg == "") {
         $("#lekarneAdvise").append("<div class=\"alert alert-success\" role=\"alert\"><b>Super!</b> Ni več bolezni! Ampak še vedno si lahko kupite vitamine v lekarno :)</div>");
     } else if (count <= 2) {
-        $("#lekarneAdvise").append("<div class=\"alert alert-warning\" role=\"alert\"><b>Pozor!</b> Vaši vitalni znaki ne izgledajo najboljše.</div>");
+        $("#lekarneAdvise").append("<div class=\"alert alert-warning\" role=\"alert\"><b>Pozor!</b> Vaši vitalni znaki ne izgledajo najboljše. Pojdite v lekarno.</div>");
     } else {
         $("#lekarneAdvise").append("<div class=\"alert alert-danger\" role=\"alert\"><b>Nevarnost!</b> Čimprej pojdite v lekarno ali k zdravniku.</div>");
     }
@@ -401,18 +407,7 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                     var sis = rows[rows.length - 1].sistolicen.magnitude;
                     var temp = rows[rows.length - 1].temperatura.magnitude;
                     var puls = rows[rows.length - 1].puls.magnitude;
-                    if(temp > 36.5 || puls > 100 || puls < 40 || sis > 120 || dia > 90){
-                        $("#lekarne").css("display","inline");
-                        $("#map-canvas").width($("#getH").width());
-                        $("#map-canvas").height($("#getH").height());
-                        var center = map.getCenter();
-                        google.maps.event.trigger(map, "resize");
-                        map.setCenter(center);
-                        displayMessage(temp, puls, sis, dia);
-                    } else {
-                        $("#lekarne").css("display","inline");
-                        displayMessage(temp, puls, sis, dia);
-                    }
+                    displayMessage(temp, puls, sis, dia);
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
                 }
