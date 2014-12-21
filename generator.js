@@ -60,24 +60,26 @@ function generatePat(varianceTemp, varianceBlood1, varianceBlood2, variancePulse
     return results;
 }
 
-function generate(name, bday, patient) { // 1, 2, 3
+function generate(name, bday, patient, dateStart, dateEnd) { // 1, 2, 3
     array = []; // JSON
-    // equal dateStart for either case (randomly generated every time it is called)
-    var day = Math.floor(Math.random() * 31) + 1;
-    var month = Math.floor(Math.random() * 12);
-    var year = Math.floor(Math.random() * 5) + 2010;
-    // day =  (month == 2 && day > 28) ? 28 : day; // ternary operator
-    /*if(month == 2 && day > 28) {
-     day = 28;
-     }*/
-    var hour = Math.floor(Math.random() * 23) + 1;
-    var min = Math.floor(Math.random() * 59) + 1;
-    var dateStart = new Date(year, month, day, hour, min, 0, 0);
+    if(dateStart == undefined && dateEnd == undefined) {
+        // equal dateStart for either case (randomly generated every time it is called)
+        var day = Math.floor(Math.random() * 31) + 1;
+        var month = Math.floor(Math.random() * 12);
+        var year = Math.floor(Math.random() * 5) + 2010;
+        // day =  (month == 2 && day > 28) ? 28 : day; // ternary operator
+        /*if(month == 2 && day > 28) {
+         day = 28;
+         }*/
+        var hour = Math.floor(Math.random() * 23) + 1;
+        var min = Math.floor(Math.random() * 59) + 1;
+        dateStart = new Date(year, month, day, hour, min, 0, 0);
+        day += Math.floor(Math.random() * 7) + 3;
+        hour = Math.floor(Math.random() * 23) + 1;
+        min = Math.floor(Math.random() * 59) + 1;
+        dateEnd = new Date(year, month, day, hour, min, 0, 0);
+    }
     array.datumZacetek = dateStart;
-    day += Math.floor(Math.random() * 7) + 3;
-    hour = Math.floor(Math.random() * 23) + 1;
-    min = Math.floor(Math.random() * 59) + 1;
-    var dateEnd = new Date(year, month, day, hour, min, 0, 0);
     array.datumKonec = dateEnd;
     //console.log(dateStart, dateEnd);
     array.ime = name;

@@ -14,6 +14,20 @@
 	  		body {padding: 10px;}
 	  		.btn {margin-top: 10px;}
 	  		.obvestilo {margin-left:10px;}
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: #000;
+				shape-rendering: crispEdges;
+			}
+			.x.axis path {
+				display: none;
+			}
+			.line {
+				fill: none;
+				stroke: steelblue;
+				stroke-width: 1.5px;
+			}
 	  	</style>
 	</head>
 	<body>
@@ -35,7 +49,13 @@
 							<input id="kreirajDatumRojstva" type="text" class="form-control input-mini" placeholder="11.12.2014">
 							<span class="add-on"><i class="icon-th"></i></span>
 						</div>
-						<span class="label label-default">Zdravilo</span><input id="kreirajZdravilo" type="text" class="form-control" placeholder="Amlessa">
+						<span class="label label-default">Zdravilo</span>
+						<select id="kreirajZdravilo" class="form-control">
+							<option value=""></option>
+							<option value="1">Lecadol plus C</option>
+							<option value="2">Amlessa</option>
+							<option value="3">Amiokordin</option>
+						</select>
 						<div class="col-lg-6 col-md-6 col-sm-6" style="padding: 0">
 							<span class="label label-default">Datum začetek zdravila</span>
 							<div id="dateStart" class="input-append date">
@@ -98,22 +118,32 @@
 						<div class="row">
 							<div class="col-lg-6 col-md-6 col-sm-6"><b>Preberi EHR zapis</b> obstoječega bolnika</div>
 							<div class="col-lg-6 col-md-6 col-sm-6">
-								<div class="dropdown">
-									<button class="btn btn-default dropdown-toggle" style="width: 100%" type="button" id="dropdownBolnik" data-toggle="dropdown" aria-expanded="true">
-										Bolniki
-										<span class="caret"></span>
-									</button>
-									<ul id="bolnikiEHR" class="dropdown-menu" role="menu" aria-labelledby="dropdownBolnik" style="width: 80%">
-										<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="izpisZdravila('6a3a47e2-59b6-471e-a076-26b7e8540ba0')">Janez Novak</a></li>
-										<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="izpisZdravila('b006f48d-84a4-43ab-a15b-29a4aa4fd742')">Tone Oblak</a></li>
-										<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="izpisZdravila('e7932a9f-3a0f-4fb3-a0c0-9bbb0988cbdc')">Metka Polen</a></li>
-									</ul>
+								<div class="col-lg-6 col-md-6 col-sm-6" style="padding: 0%">
+									<div class="checkbox">
+										<label>
+											<input id="narisiGraf" type="checkbox"> Nariši
+										</label>
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6" style="padding: 0%">
+									<div class="dropdown">
+										<button class="btn btn-default dropdown-toggle" type="button" id="dropdownBolnik" style="width: 100%" data-toggle="dropdown" aria-expanded="true">
+											Bolniki
+											<span class="caret"></span>
+										</button>
+										<ul id="bolnikiEHR" class="dropdown-menu" role="menu" aria-labelledby="dropdownBolnik" style="width: 80%">
+											<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="izpisZdravila('6a3a47e2-59b6-471e-a076-26b7e8540ba0')">Janez Novak</a></li>
+											<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="izpisZdravila('b006f48d-84a4-43ab-a15b-29a4aa4fd742')">Tone Oblak</a></li>
+											<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="izpisZdravila('e7932a9f-3a0f-4fb3-a0c0-9bbb0988cbdc')">Metka Polen</a></li>
+										</ul>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="panel-body">
 						<input id="preberiEHRid" type="hidden" class="form-control input-mini" placeholder="7b661e12-3a98-21ad-c29e-2dc9f5a3d885">
+						<div id="podatkiBolnika"></div>
 						<span id="preberiSporocilo"></span>
 						<div id="rezultatiEHR"></div>
 					</div>

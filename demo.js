@@ -18,9 +18,17 @@ function getSessionId() {
     return response.responseJSON.sessionId;
 }
 
+function getFormattedDate(date) {
+    var datum = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
+    var ura = (date.getUTCHours().toString().length == 1) ? "0" + date.getUTCHours() : date.getUTCHours();
+    var minute = (date.getUTCMinutes().toString().length == 1) ? "0" + date.getUTCMinutes() : date.getUTCMinutes();
+    var cas = ura + ":" + minute;
+    return datum + ", " + cas;
+}
+
 function dodajNoviPacijentDropDown(ime, priimek, ehrId) {
     $("#preberiObstojeciVitalniZnak").append("<option value='" + ehrId + "' selected>" + ime + " " + priimek + "</option>");
-    $("#bolnikiEHR").append("<li role=\"presentation\"><a role=\"menuitem\" tabindex=\"-1\" href=\"#\">"+ime +" "+ priimek +"</a></li>");
+    $("#bolnikiEHR").append("<li role=\"presentation\"><a role=\"menuitem\" tabindex=\"-1\" href=\"#\" onclick=\"izpisZdravila('"+ehrId+"')\">"+ime +" "+ priimek +"</a></li>");
     $("#preberiEhrIdZaVitalneZnake").append("<option value='" + ehrId + "'>" + ime + " " + priimek + "</option>");
 }
 
@@ -30,10 +38,39 @@ function kreirajEHRzaBolnika() {
     var ime = $("#kreirajIme").val();
     var priimek = $("#kreirajPriimek").val();
     var datumRojstva = $("#kreirajDatumRojstva").val();
-
-    if (!ime || !priimek || !datumRojstva || ime.trim().length == 0 || priimek.trim().length == 0 || datumRojstva.trim().length == 0) {
+    var zdrNum = $("#kreirajZdravilo").val();
+    var datumZacZdravil = $("#kreirajZacetekZdravila").val();
+    var datumKonZdravil = $("#kreirajKonecZdravila").val();
+    var zdravilo = "x";
+    switch (zdrNum) {
+        case '1':
+            console.log(1);
+            zdravilo = "Lecadol plus C";
+            break;
+        case '2':
+            console.log(2);
+            zdravilo = "Amlessa";
+            break;
+        case '3':
+            console.log(3);
+            zdravilo = "Amiokordin";
+            break;
+        default:
+            console.log("blah");
+    }
+    if (!ime || !priimek || !datumRojstva || !zdravilo || !datumZacZdravil || !datumKonZdravil ||
+        ime.trim().length == 0 || priimek.trim().length == 0 || datumRojstva.trim().length == 0 ||
+        zdravilo.trim().length == 0 || datumZacZdravil.trim().length == 0 || datumKonZdravil.trim().length == 0) {
         $("#kreirajSporocilo").html("<span class='obvestilo label label-warning fade-in'>Prosim vnesite zahtevane podatke!</span>");
     } else {
+        datumZacZdravil = new Date(datumZacZdravil);
+        datumKonZdravil = new Date(datumKonZdravil);
+        if(datumZacZdravil.getTime() > datumKonZdravil.getTime() ||
+            datumRojstva.getTime() > datumZacZdravil.getTime() ||
+                datumRojstva.getTime() > datumKonZdravil.getTime()) {
+            $("#kreirajSporocilo").html("<span class='obvestilo label label-danger fade-in'>Prosim vnesite pravilne podatke!</span>");
+            return;
+        }
         $.ajaxSetup({
             headers: {"Ehr-Session": sessionId}
         });
@@ -55,10 +92,41 @@ function kreirajEHRzaBolnika() {
                     data: JSON.stringify(partyData),
                     success: function (party) {
                         if (party.action == 'CREATE') {
-                            $("#kreirajSporocilo").html("<span class='obvestilo label label-success fade-in'>Uspešno kreiran EHR '" + ehrId + "'.</span>");
-                            console.log("Uspešno kreiran EHR '" + ehrId + "'.");
-                            $("#preberiEHRid").val(ehrId);
-                            dodajNoviPacijentDropDown(ime, priimek, ehrId);
+                            $.ajaxSetup({
+                                headers: {"Ehr-Session": sessionId}
+                            });
+                            var podatki = {
+                                "ctx/language": "en",
+                                "ctx/territory": "SI",
+                                "ctx/time": "2014-11-21T11:40Z",
+                                "medications/medication_instruction/order/medicine": zdravilo,
+                                "medications/medication_instruction/narrative": "take medication every 8 hours",
+                                "medications/medication_instruction/order/timing": "R1",
+                                "medications/medication_instruction/order/medication_timing/start_date": datumZacZdravil.toISOString(),
+                                "medications/medication_instruction/order/medication_timing/stop_date": datumKonZdravil.toISOString()
+                            };
+                            var parametriZahteve = {
+                                ehrId: ehrId,
+                                templateId: 'Medications',
+                                format: 'FLAT'
+                            };
+                            $.ajax({
+                                url: baseUrl + "/composition?" + $.param(parametriZahteve),
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify(podatki),
+                                success: function (res) {
+                                    //console.log("success:", res.meta.href);
+                                    // console.log(data.meritve);
+                                    console.log("uspesno kreiran EHR: " + ehrId);
+                                    $("#kreirajSporocilo").html("<span class='obvestilo label label-success fade-in'>Uspešno kreiran EHR '" + ehrId + "'.</span>");
+                                    dodajNoviPacijentDropDown(ime, priimek, ehrId);
+                                },
+                                error: function(err){
+                                    $("#kreirajSporocilo").html("<span class='obvestilo label label-danger fade-in'>Napaka '" + JSON.parse(err.responseText).userMessage + "'!");
+                                    console.log(JSON.parse(err.responseText).userMessage);
+                                }
+                            })
                         }
                     },
                     error: function (err) {
@@ -77,15 +145,21 @@ function generirajNakljucnePodatke() {
     var ime = $("#kreirajIme").val();
     var priimek = $("#kreirajPriimek").val();
     var datumRojstva = $("#kreirajDatumRojstva").val();
+    var zdravilo = $("#kreirajZdravilo").val();
+    var datumZacZdravil = $("#kreirajZacetekZdravila").val();
+    var datumKonZdravil = $("#kreirajKonecZdravila").val();
+    console.log(">>>" + zdravilo, datumZacZdravil, datumKonZdravil);
 
-    if (!ime || !priimek || !datumRojstva || ime.trim().length == 0 || priimek.trim().length == 0 || datumRojstva.trim().length == 0) {
+    if (!ime || !priimek || !datumRojstva || !zdravilo || !datumZacZdravil || !datumKonZdravil ||
+        ime.trim().length == 0 || priimek.trim().length == 0 || datumRojstva.trim().length == 0 ||
+        zdravilo.trim().length == 0 || datumZacZdravil.trim().length == 0 || datumKonZdravil.trim().length == 0) {
         $("#kreirajSporocilo").html("<span class='obvestilo label label-warning fade-in'>Prosim vnesite zahtevane podatke!</span>");
     } else {
         var name = ime + " " + priimek;
         var datum = new Date(datumRojstva).toISOString();
         var bolezen = Math.floor(Math.random()*3) + 1;
         console.log(name, datum, bolezen);
-        var data = generate(name, datum, bolezen);
+        var data = generate(name, datum, bolezen, new Date(datumZacZdravil), new Date(datumKonZdravil));
         console.log(data);
         var ehrID = insertData(data);
     }
@@ -182,13 +256,6 @@ function dodajMeritveVitalnihZnakov() {
             }
         });
     }
-}
-function getFormattedDate(date) {
-    var datum = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
-    var ura = (date.getUTCHours().toString().length == 1) ? "0" + date.getUTCHours() : date.getUTCHours();
-    var minute = (date.getUTCMinutes().toString().length == 1) ? "0" + date.getUTCMinutes() : date.getUTCMinutes();
-    var cas = ura + ":" + minute;
-    return datum + ", " + cas;
 }
 
 function izpisZdravila(ehrId, datumZac, datumKon) {
