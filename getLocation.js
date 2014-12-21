@@ -4,6 +4,7 @@
 var lat, lon;
 var map;
 
+
 function getLocation() {
     if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -89,7 +90,6 @@ function showPosition(position) {
         }
         info[1].open(map,markers[1]);
     });
-
 }
 
 function calculateDistance(myLatLang) {
@@ -131,8 +131,6 @@ function showError(err) {
 }
 
 function initialize() {
-    /*$("#map-canvas").width($("#getH").width());
-    $("#map-canvas").height($("#getH").height());*/
     var mapOptions = {
         zoom: 12,
         center: new google.maps.LatLng(46.057184, 14.506865)
@@ -155,6 +153,15 @@ function loadScript() {
 }
 
 window.onload = loadScript;
+//google.maps.event.addDomListener(window, 'load', initialize);
+google.maps.event.addDomListener(window, "resize", function() {
+    $("#map-canvas").width($("#getH").width());
+    $("#map-canvas").height($("#getH").height());
+    resizeGraphs();
+    var center = map.getCenter();
+    google.maps.event.trigger(map, "resize");
+    map.setCenter(center);
+});
 
 /*$(document).ready(function(){
     getLocation();

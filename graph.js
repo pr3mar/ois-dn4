@@ -4,7 +4,24 @@
 
 var dimX, dimY;
 dimX = 600; dimY = 350;
+
+var tmpData;
+
+function resizeGraphs() {
+    drawGraphTemp();
+    drawGraphPuls();
+    drawGraphTlakDia();
+    drawGraphTlakSis();
+}
 function drawGraphPuls(patient) {
+    if(patient == undefined && tmpData != undefined) {
+        patient = tmpData;
+    } else if(patient != undefined && tmpData == undefined) {
+        tmpData = patient;
+    } else if (patient == undefined && tmpData == undefined) {
+        return;
+    }
+    console.log(tmpData);
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = $("#getH").width() - margin.left - margin.right,
@@ -77,6 +94,13 @@ function drawGraphPuls(patient) {
         .attr("d", line);
 }
 function drawGraphTlakSis(patient) {
+    if(patient == undefined && tmpData != undefined) {
+        patient = tmpData;
+    } else if(patient != undefined && tmpData == undefined) {
+        tmpData = patient;
+    } else if (patient == undefined && tmpData == undefined) {
+        return;
+    }
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = $("#getH").width() - margin.left - margin.right,
@@ -149,6 +173,13 @@ function drawGraphTlakSis(patient) {
         .attr("d", line);
 }
 function drawGraphTlakDia(patient) {
+    if(patient == undefined && tmpData != undefined) {
+        patient = tmpData;
+    } else if(patient != undefined && tmpData == undefined) {
+        tmpData = patient;
+    } else if (patient == undefined && tmpData == undefined) {
+        return;
+    }
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = $("#getH").width() - margin.left - margin.right,
@@ -222,6 +253,13 @@ function drawGraphTlakDia(patient) {
 }
 
 function drawGraphTemp(patient) {
+    if(patient == undefined && tmpData != undefined) {
+        patient = tmpData;
+    } else if(patient != undefined && tmpData == undefined) {
+        tmpData = patient;
+    } else if (patient == undefined && tmpData == undefined) {
+        return;
+    }
     //console.log(patient);
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = $("#getH").width() - margin.left - margin.right,

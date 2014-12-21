@@ -373,6 +373,11 @@ function izpisZdravila(ehrId, datumZac, datumKon) {
                     var puls = rows[rows.length - 1].puls.magnitude;
                     if(temp > 36.5 || puls > 100 || puls < 40 || sis > 120 || dia > 90){
                         $("#lekarne").css("display","inline");
+                        $("#map-canvas").width($("#getH").width());
+                        $("#map-canvas").height($("#getH").height());
+                        var center = map.getCenter();
+                        google.maps.event.trigger(map, "resize");
+                        map.setCenter(center);
                     }
                 } else {
                     $("#preberiSporocilo").html("<span class='obvestilo label label-warning fade-in'>Ni podatkov!</span>");
